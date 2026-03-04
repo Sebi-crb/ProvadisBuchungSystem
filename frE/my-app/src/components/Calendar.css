@@ -1,0 +1,13 @@
+:root {
+  --fc-border-color: #e0e0e0;
+  --fc-button-bg-color: #026291;
+  --fc-button-background-color: #026291;
+  --fc-button-border-color: #026291;
+  --fc-button-hover-bg-color: #1565c0;
+  --fc-button-active-bg-color: #0d47a1;
+  --fc-today-bg-color: #e3f2fd;
+  --fc-event-bg-color: #1976d2;
+  --fc-event-border-color: #1976d2;
+  --fc-page-bg-color: #ffffff;
+  --fc-neutral-bg-color: #f5f5f5;
+}
