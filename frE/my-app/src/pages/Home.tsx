@@ -2,10 +2,12 @@ import { Button } from "@mui/material";
 import Drawer from "@mui/material/Drawer";
 import { useNavigate } from "react-router-dom";
 import Calendar from "../components/Calendar";
+import data from "../responses/Homepage.json";
 
 export default function Home() {
   const navigate = useNavigate();
-
+    console.log(data);
+    let termine = data.termine
   return (
     <div>
       <Drawer
@@ -37,7 +39,7 @@ export default function Home() {
         </Button>
       </Drawer>
 
-      <Calendar />
+      <Calendar termine={termine} />
     </div>
   );
 }

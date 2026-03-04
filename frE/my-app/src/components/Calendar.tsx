@@ -1,20 +1,36 @@
+import { useState } from 'react';
 import './Calendar.css';
 import FullCalendar from '@fullcalendar/react'
 import timeGridPlugin from '@fullcalendar/timegrid'
 import dayGridPlugin from '@fullcalendar/daygrid'
 import deLocale from '@fullcalendar/core/locales/de'
 import { Box } from '@mui/material';
+import InfoPopup from './InfoPopup.tsx';
+import AddPopup  from './AddPopup.tsx';
 
-export default function Calendar() {
 
-    const events = [
-        { title: "Kurs 1", start: "2026-03-02", end: "2026-03-02T12:00:00" },
-        { title: "Kurs 2", start: "2026-03-04T14:00:00", end: "2026-03-04T16:00:00" },
-        { title: "Kurs 3", start: "2026-03-05T09:00:00", end: "2026-03-15T11:00:00" },
-    ];
+export default function Calendar(props: { termine: any }) {
+    const [showInfoPopup, setShowInfoPopup] = useState(false);
+    const [selectedEvent, setSelectedEvent] = useState(null);
+
+    const [showAddPopup, setShowAddPopup] = useState(false);
+
+
+    function openEventDetails(info: any) {
+        console.log(info);
+        setSelectedEvent(info.event);
+        setShowInfoPopup(true);
+        console.log(info.event.extendedProps);
+    }
+
+    function addNewEvent() {
+        setShowAddPopup(true);
+    }
 
   return (
     <>
+      {showInfoPopup && <InfoPopup onClose={() => setShowInfoPopup(false)} event={selectedEvent} />}
+        {showAddPopup && <AddPopup onClose={() => setShowAddPopup(false)} event={null} />}
       <Box sx={{ width: "70vw" }}>
         <FullCalendar
           plugins={[timeGridPlugin, dayGridPlugin]}
@@ -25,12 +41,12 @@ export default function Calendar() {
           headerToolbar={{
             left: 'prev,next today',
             center: 'title',
-            right: 'addEvent timeGridWeek,timeGridDay,dayGridMonth',
+            right: 'addEvent timeGridDay,timeGridWeek,dayGridMonth',
           }}
           customButtons={{
             addEvent: {
                 text: "+",
-                click: () => null,
+                click: () => addNewEvent(),
                 hint: "Neuen Kurs eintragen"
             }
           }}
@@ -39,7 +55,8 @@ export default function Calendar() {
               weekends: false  
             }
           }}
-          events={events}
+          events={props.termine}
+          eventClick={(info) => {openEventDetails(info)}}
         />
     
       </Box>

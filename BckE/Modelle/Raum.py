@@ -10,7 +10,6 @@ class Raum:
 
 
 
-
     def __str__(self):
         is_avail = str(self.isAvailable) if getattr(self, 'isAvailable', None) is not None else 'unbekannt'
         return self.name + ' ' + self.isPC +  ' ' +   self.isFree
