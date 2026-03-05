@@ -1,0 +1,50 @@
+{
+    "groups": [
+      {
+        "gruppenId": 1,
+        "block": "A",
+        "azubis": [
+          { "name": "eren senkaya", "unternehmen": "Commerzbank AG", "id": 1, "ausbildungsjahr": 1 },
+          { "name": "ali arikan", "unternehmen": "Commerzbank AG", "id": 2, "ausbildungsjahr": 1 },
+          { "name": "nsoidasd sdasdegth", "unternehmen": "gay people AG", "id": 3, "ausbildungsjahr": 1 }
+        ]
+      },
+      {
+        "gruppenId": 2,
+        "block": "B",
+        "azubis": [
+          { "name": "lena hoffmann", "unternehmen": "Deutsche Bank AG", "id": 4, "ausbildungsjahr": 2 },
+          { "name": "marco schneider", "unternehmen": "PwC Deutschland", "id": 5, "ausbildungsjahr": 2 },
+          { "name": "sara yilmaz", "unternehmen": "ING Deutschland", "id": 6, "ausbildungsjahr": 2 }
+        ]
+      },
+      {
+        "gruppenId": 3,
+        "block": "C",
+        "azubis": [
+          { "name": "tim berger", "unternehmen": "KPMG AG", "id": 7, "ausbildungsjahr": 3 },
+          { "name": "maria schulz", "unternehmen": "DZ Bank", "id": 8, "ausbildungsjahr": 3 },
+          { "name": "ahmet kaya", "unternehmen": "Fraport AG", "id": 9, "ausbildungsjahr": 3 }
+        ]
+      },
+      {
+        "gruppenId": 4,
+        "block": "D",
+        "azubis": [
+          { "name": "julia meyer", "unternehmen": "Allianz SE", "id": 10 },
+          { "name": "kevin roth", "unternehmen": "Lufthansa Group", "id": 11 },
+          { "name": "melissa özdemir", "unternehmen": "Helaba", "id": 12 }
+        ]
+      },
+      {
+        "gruppenId": 5,
+        "block": "E",
+        "azubis": [
+          { "name": "daniel krüger", "unternehmen": "SAP SE", "id": 13 },
+          { "name": "sophie wagner", "unternehmen": "BASF SE", "id": 14 },
+          { "name": "maximilian fischer", "unternehmen": "Siemens AG", "id": 15 }
+        ]
+      }
+    ]
+  }
+  
