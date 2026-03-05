@@ -7,7 +7,7 @@ class Trainer:
     _name: str = field(default="")
     _vorname: str = field(default="")
     _modulTeacher: list = field(default="")
-    _urlaub: list = field(default="")
+    _abwesenheiten: list = field(default="")
     _blockedModul: list = field(default="")
 
 
@@ -46,11 +46,11 @@ class Trainer:
         self._modulTeacher = modulTeacher.strip(' ')
 
     @property
-    def urlaub(self):
-        return self._urlaub
-    @urlaub.setter
-    def urlaub(self, urlaub):
-        self._urlaub = urlaub.strip(' ')
+    def abwesenheiten(self):
+        return self._abwesenheiten
+    @abwesenheiten.setter
+    def abwesenheiten(self, abwesenheiten):
+        self._abwesenheiten = abwesenheiten.strip(' ')
 
     @property
     def blockedModul(self):

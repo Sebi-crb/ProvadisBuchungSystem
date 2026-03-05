@@ -1,9 +1,9 @@
 import sqlite3
 from datetime import date
 import ProvadisBuchungSystem.BckE.Modelle.Trainer as Trainer
+#from ProvadisBuchungSystem.BckE.Calendar.Calendar_Trainer import remove_absence
 
-
-DB = "WIP.db"
+DB = "WIP2.db"
 
 def create_table():
     with sqlite3.connect(DB) as conn:
@@ -12,10 +12,7 @@ def create_table():
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             Name TEXT NOT NULL,
             Vorname TEXT NOT NULL,
-            Module TEXT NOT NULL,
-            Urlaub TEXT NOT NULL,
-            BlockedWeeks TEXT NOT NULL
-            
+            Abwesenheiten TEXT NOT NULL
         );
         """)
         conn.commit()
@@ -26,17 +23,17 @@ def delete(id_):
 def insert_Trainer(Trainer):
     with sqlite3.connect(DB) as conn:
         samples = [
-            (Trainer.name, Trainer.vorname, Trainer.modulTeacher, "2, 3, 5", "21, 31, 51"),
+            (Trainer.name, Trainer.vorname, Trainer.abwesenheiten),
         ]
         conn.executemany(
-            "INSERT INTO Trainer (Name, Vorname, Module, Urlaub, BlockedWeeks) VALUES (?, ?, ?, ?, ?)",
+            "INSERT INTO Trainer (Name, Vorname, Abwesenheiten) VALUES (?, ?, ?)",
             samples
         )
         conn.commit()
 
 def get_all_Trainers():
     with sqlite3.connect(DB) as conn:
-        cur = conn.execute("SELECT id, Name, Vorname, Module, Urlaub, BlockedWeeks FROM Trainer")
+        cur = conn.execute("SELECT id, Name, Vorname, Abwesenheiten FROM Trainer")
         rows = cur.fetchall()
         for r in rows:
             print(r)
@@ -51,10 +48,9 @@ def get_Trainer(id_):
 
 def change_absence(id_, toRemove):
     with sqlite3.connect(DB) as conn:
-        conn.execute("SELECT Abwesenheiten FROM Trainer WHERE id = ?", (id_,))
-        row = conn.fetchone()
+        cur = conn.execute("SELECT Abwesenheiten FROM Trainer WHERE id = ?", (id_,))
+        row = cur.fetchone()
         if not row:
-            conn.close()
             return
 
         # Text in Liste umwandeln
@@ -70,34 +66,68 @@ def change_absence(id_, toRemove):
 
         # Update in DB schreiben
         conn.execute(
-            f"UPDATE Trainer SET Abwesenheiten = ? WHERE id = ?",
+            "UPDATE Trainer SET Abwesenheiten = ? WHERE id = ?",
             (neuer_text, id_)
         )
 
-        conn.commit()
-        conn.close()
+        return neuer_text
+
+
+def add_absence(id_, toAdd):
+    with sqlite3.connect(DB) as conn:
+        cur = conn.execute("SELECT Abwesenheiten FROM Trainer WHERE id = ?", (id_,))
+        row = cur.fetchone()
+        if not row:
+            return
+
+        # Aktuelle Werte in Liste umwandeln
+        werte = row[0]  # z.B. "1, 3, 5"
+        liste = [x.strip() for x in werte.split(",") if x.strip()]
+
+        # Neue Werte hinzufügen (als Strings)
+        for w in toAdd:
+            w_str = str(w)
+            if w_str not in liste:
+                liste.append(w_str)
+
+        # Sortieren optional (falls du die Reihenfolge sauber halten willst)
+        liste = sorted(liste, key=lambda x: int(x))
+
+        # Neue Zeichenkette erzeugen
+        neuer_text = ", ".join(liste)
+
+        # Update in DB schreiben
+        conn.execute(
+            "UPDATE Trainer SET Abwesenheiten = ? WHERE id = ?",
+            (neuer_text, id_)
+        )
 
         return neuer_text
+
 
 
 def main():
     import ProvadisBuchungSystem.BckE.Modelle.Trainer as Trainer
     with sqlite3.connect(DB) as conn:
-        #create_table(conn)
+        create_table()
         #insert_sample(conn)
         #azubi = GFD.generate_azubi()
         #insert_Azubi(azubi)
         Trainer = Trainer.Trainer()
         Trainer.name = "Stark"
         Trainer.vorname = "Tony"
-        Trainer.modulTeacher = "9, 10, 11"
-        insert_Trainer(Trainer)
+        Trainer.Abwesenheiten = "9, 10, 11"
+        #insert_Trainer(Trainer)
+        #add_absence(1, [str(2), str(3), str(4)])
+        change_absence(1, [str(3)])
 
         print("Aktuelle Einträge in Trainer:")
+        get_all_Trainers()
         #print_all()
 
+main()
 #if __name__ == "__main__":
 #   main()
-print(get_all_Trainers())
+#print(get_all_Trainers())
 
 #create_table()
