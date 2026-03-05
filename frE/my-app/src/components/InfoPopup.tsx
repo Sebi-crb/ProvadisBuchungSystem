@@ -43,7 +43,7 @@ export default function Popup({
         <h2>{event?.title}</h2>
         <div style={{ float: "right", marginRight: "5vw" }}>
           <h4>Trainer:</h4>
-          {event?.extendedProps?.trainer.map((trainer: any) => (
+          {event?.extendedProps?.trainer?.map((trainer: any) => (
             <p>{trainer}</p>
           ))}
         </div>
@@ -59,7 +59,7 @@ export default function Popup({
             Raum: {event?.extendedProps?.raum}
         </div>
         <div>
-            Zeitspanne: {event?.startStr} - {event?.endStr}
+            Zeitspanne: {event?.startStr.split("T")[0]} - {event?.endStr.split("T")[0]}
         </div>
       </Box>
     </>

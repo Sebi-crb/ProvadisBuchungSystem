@@ -26,10 +26,10 @@ export default function AddPopup({
   function saveEvent() {
     const newEvent = {
       title: modul,
-      start: startDate,
-      end: endDate,
+      start: startDate.toDateString().split("T"),
+      end: endDate.toDateString().split("T"),
       extendedProps: {
-        trainer: trainer,
+        trainer: [trainer],
         group: group,
       },
     };
@@ -73,7 +73,9 @@ export default function AddPopup({
           <h4>Start</h4>
           <DatePicker
             selected={startDate}
-            onChange={(date: any) => setStartDate(date)}
+            onChange={(date: any) => {
+              setStartDate(date);
+            }}
             className="datepicker"
           />
         </div>
@@ -97,6 +99,7 @@ export default function AddPopup({
         </div>
         <div>
           <Autocomplete
+            multiple
             disablePortal
             options={trainers}
             sx={{ width: 300 }}

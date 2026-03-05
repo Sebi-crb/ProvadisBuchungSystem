@@ -35,6 +35,8 @@ export default function Calendar(props: { termine: any }) {
   }, [props.termine]);
     
     function handleNewEvent(event: any) {
+      event.start = new Date(event.start);
+      event.end = new Date(event.end);
         setEvents((prev: any) => [...prev, event]);
     }
 
