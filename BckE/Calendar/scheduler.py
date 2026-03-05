@@ -1,15 +1,8 @@
-"""
-Minimalistischer Schulplaner
-Nur das Nötigste!
-"""
 from datetime import date, timedelta
 from ortools.sat.python import cp_model
 import config
 
 
-# ============================================================================
-# HILFSFUNKTIONEN
-# ============================================================================
 
 def get_available_days():
     """Alle Arbeitstage (Mo-Fr, keine Ferien)"""
@@ -26,7 +19,7 @@ def get_available_days():
         if current.weekday() < 5 and current not in all_holidays:
             available.append(current)
         current += timedelta(days=1)
-    #print(available)
+    print(available)
     return available
 
 
@@ -45,25 +38,23 @@ def is_block_in_school(block_id, check_date):
         return 4 <= cycle_week < 6
 
 
-# ============================================================================
-# SCHEDULER
-# ============================================================================
 
 def create_schedule():
-    """Erstelle Stundenplan"""
 
-    available_days = get_available_days()
+
+    available_days = get_available_days() #die verfügbaren Tage der Azubigruppe
     print(f"📅 {len(available_days)} verfügbare Tage")
 
     # Erstelle Modell
-    model = cp_model.CpModel()
+    model = cp_model.CpModel() # Erstellung eines leeren Stundenplans
 
     # Variablen: Wann startet jeder Kurs?
-    course_vars = {}
-    for i, course in enumerate(config.COURSES):
-        course_vars[i] = {}
-        for j, day in enumerate(available_days):
-            course_vars[i][j] = (model.NewBoolVar(f"c{i}_d{j}"), day)
+    course_vars = {} #dict für die Kurse aus der config
+    for i, course in enumerate(config.COURSES): # Schleife auf die Kurse aus der config, i ist der Zähler und course ist der Kurs
+        course_vars[i] = {} # Anlegen eines dicts in Index i
+        for j, day in enumerate(available_days): # Schleife auf die available days mit einem index
+            course_vars[i][j] = (model.NewBoolVar(f"c{i}_d{j}"), day) # speichern der verfügbaren Tage eines Kurses im Jahr: z.B. c0_d51 -> Kurs[0] ist an diesem Tag verfügbar, dazu noch das kalendarische Datum
+            print(course_vars[i][j])
 
     # CONSTRAINT 1: Jeder Kurs startet genau 1x
     for i in range(len(config.COURSES)):
@@ -152,9 +143,6 @@ def create_schedule():
     return solver, course_vars, available_days
 
 
-# ============================================================================
-# AUSGABE
-# ============================================================================
 
 def print_schedule(solver, course_vars, available_days):
     """Gib Stundenplan aus"""
