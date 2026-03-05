@@ -1,9 +1,7 @@
 import sqlite3
 from datetime import date
-import Modelle.Trainer
+import ProvadisBuchungSystem.BckE.Modelle.Trainer as Trainer
 
-
-from Modelle.Trainer import Trainer
 
 DB = "WIP.db"
 
@@ -36,7 +34,7 @@ def insert_Trainer(Trainer):
         )
         conn.commit()
 
-def print_all():
+def get_all_Trainers():
     with sqlite3.connect(DB) as conn:
         cur = conn.execute("SELECT id, Name, Vorname, Module, Urlaub, BlockedWeeks FROM Trainer")
         rows = cur.fetchall()
@@ -44,23 +42,62 @@ def print_all():
             print(r)
         return rows
 
+def get_Trainer(id_):
+    with sqlite3.connect(DB) as conn:
+        cur = conn.execute("SELECT * FROM Trainer WHERE id=?", (id_,))
+        row = cur.fetchone()
+        return row
+
+
+def change_absence(id_, toRemove):
+    with sqlite3.connect(DB) as conn:
+        conn.execute("SELECT Abwesenheiten FROM Trainer WHERE id = ?", (id_,))
+        row = conn.fetchone()
+        if not row:
+            conn.close()
+            return
+
+        # Text in Liste umwandeln
+        werte = row[0]  # z.B. "1, 2, 3, 4, 5"
+        liste = [x.strip() for x in werte.split(",")]
+
+        # Werte entfernen (als Strings vergleichen)
+        werte_entfernen = set(str(w) for w in toRemove)
+        neue_liste = [x for x in liste if x not in werte_entfernen]
+
+        # Neue Zeichenkette erzeugen
+        neuer_text = ", ".join(neue_liste)
+
+        # Update in DB schreiben
+        conn.execute(
+            f"UPDATE Trainer SET Abwesenheiten = ? WHERE id = ?",
+            (neuer_text, id_)
+        )
+
+        conn.commit()
+        conn.close()
+
+        return neuer_text
+
+
 def main():
+    import ProvadisBuchungSystem.BckE.Modelle.Trainer as Trainer
     with sqlite3.connect(DB) as conn:
         #create_table(conn)
         #insert_sample(conn)
         #azubi = GFD.generate_azubi()
         #insert_Azubi(azubi)
-        Trainer = Modelle.Trainer.Trainer()
+        Trainer = Trainer.Trainer()
         Trainer.name = "Stark"
         Trainer.vorname = "Tony"
         Trainer.modulTeacher = "9, 10, 11"
         insert_Trainer(Trainer)
 
         print("Aktuelle Einträge in Trainer:")
-        print_all()
+        #print_all()
 
 #if __name__ == "__main__":
 #   main()
-print_all()
+print(get_all_Trainers())
 
 #create_table()
