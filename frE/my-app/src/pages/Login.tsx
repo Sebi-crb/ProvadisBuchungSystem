@@ -4,14 +4,28 @@ import TextField from "@mui/material/TextField";
 
 export default function Login() {
   return (
-    <>
+    <Box
+      sx={{
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        minHeight: "100vh",
+        width: "100%",
+      }}
+    >
       <Box
         component="section"
         sx={{
           backgroundColor: "#026291",
           width: "20vw",
+          minWidth: "300px",
           height: "40vh",
           boxShadow: "5px 10px 12px rgba(0, 0, 0, 0.1)",
+          padding: "20px",
+          borderRadius: "8px",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
         }}
       >
         <h2 style={{ marginTop: "5px" }}>Login</h2>
@@ -48,8 +62,22 @@ export default function Login() {
             "& .MuiOutlinedInput-input": { color: "white" },
           }}
         />
-        <input type="submit" value="Login" />
+        <input 
+          type="submit" 
+          value="Login"
+          style={{
+            marginTop: "20px",
+            padding: "10px 20px",
+            backgroundColor: "white",
+            color: "#026291",
+            border: "none",
+            borderRadius: "4px",
+            cursor: "pointer",
+            fontSize: "16px",
+            fontWeight: "bold",
+          }}
+        />
       </Box>
-    </>
+    </Box>
   );
 }
