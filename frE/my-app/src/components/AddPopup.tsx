@@ -1,4 +1,4 @@
-import { Autocomplete, Box, TextField } from "@mui/material";
+import { Autocomplete, Box, Button, TextField } from "@mui/material";
 import { useState } from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
@@ -7,25 +7,35 @@ import "../css/addPopup.css";
 export default function AddPopup({
   onClose,
   event,
+  onSend,
 }: {
   onClose: () => void;
   event: any;
+  onSend: (event: any) => void;
 }) {
   const [startDate, setStartDate] = useState(new Date());
   const [endDate, setEndDate] = useState(startDate);
+  const [modul, setModul] = useState("");
+  const [trainer, setTrainer] = useState("");
+  const [group, setGroup] = useState("");
 
-    const modules = [
-        { label: "Modul 1" },
-        { label: "Modul 2" },
-    ]
-    const trainer = [
-        { label: "Trainer 1" },
-        { label: "Trainer 2" },
-    ]
-    const group = [
-        { label: "Gruppe 1" },
-        { label: "Gruppe 2" },
-    ]
+  const modules = [{ label: "Modul 1" }, { label: "Modul 2" }];
+  const trainers = [{ label: "Trainer 1" }, { label: "Trainer 2" }];
+  const groups = [{ label: "Gruppe 1" }, { label: "Gruppe 2" }];
+
+  function saveEvent() {
+    const newEvent = {
+      title: modul,
+      start: startDate,
+      end: endDate,
+      extendedProps: {
+        trainer: trainer,
+        group: group,
+      },
+    };
+    onSend(newEvent);
+    console.log("Neuer Kurs:", newEvent);
+  }
 
   return (
     <>
@@ -73,6 +83,7 @@ export default function AddPopup({
             selected={endDate}
             onChange={(date: any) => setEndDate(date)}
             className="datepicker"
+            highlightDates={[startDate]}
           />
         </div>
         <div>
@@ -81,24 +92,36 @@ export default function AddPopup({
             options={modules}
             sx={{ width: 300 }}
             renderInput={(params) => <TextField {...params} label="Modul" />}
+            onChange={(value: any) => setModul(value.target.innerText)}
           />
         </div>
         <div>
-                      <Autocomplete
+          <Autocomplete
             disablePortal
-            options={trainer}
+            options={trainers}
             sx={{ width: 300 }}
             renderInput={(params) => <TextField {...params} label="Trainer" />}
+            onChange={(value: any) => setTrainer(value.target.innerText)}
           />
         </div>
         <div>
-                                  <Autocomplete
+          <Autocomplete
             disablePortal
-            options={group}
+            options={groups}
             sx={{ width: 300 }}
             renderInput={(params) => <TextField {...params} label="Group" />}
+            onChange={(value: any) => setGroup(value.target.innerText)}
           />
         </div>
+        <Button
+          variant="contained"
+          sx={{ backgroundColor: "#0C2F6F" }}
+          onClick={() => {
+            saveEvent();
+          }}
+        >
+          Speichern
+        </Button>
       </Box>
     </>
   );

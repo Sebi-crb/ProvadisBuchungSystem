@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import './Calendar.css';
 import FullCalendar from '@fullcalendar/react'
 import timeGridPlugin from '@fullcalendar/timegrid'
@@ -7,6 +7,7 @@ import deLocale from '@fullcalendar/core/locales/de'
 import { Box } from '@mui/material';
 import InfoPopup from './InfoPopup.tsx';
 import AddPopup  from './AddPopup.tsx';
+import type { EventSourceInput } from '@fullcalendar/core/index.js';
 
 
 export default function Calendar(props: { termine: any }) {
@@ -14,6 +15,31 @@ export default function Calendar(props: { termine: any }) {
     const [selectedEvent, setSelectedEvent] = useState(null);
 
     const [showAddPopup, setShowAddPopup] = useState(false);
+
+    const emptyEvent = {
+        title: "",
+        start: new Date(),
+        end: new Date(),
+        extendedProps: {
+          trainer: [],
+          group: [],
+          raum: ""
+        }
+    }
+    const [newEvent, setNewEvent] = useState(emptyEvent);
+
+    const [events, setEvents] = useState<EventSourceInput>(props.termine);
+
+    useEffect(() => {
+      setEvents(props.termine);
+  }, [props.termine]);
+    
+    function handleNewEvent(event: any) {
+        setEvents((prev: any) => [...prev, event]);
+    }
+
+    
+
 
 
     function openEventDetails(info: any) {
@@ -30,7 +56,7 @@ export default function Calendar(props: { termine: any }) {
   return (
     <>
       {showInfoPopup && <InfoPopup onClose={() => setShowInfoPopup(false)} event={selectedEvent} />}
-        {showAddPopup && <AddPopup onClose={() => setShowAddPopup(false)} event={null} />}
+        {showAddPopup && <AddPopup onClose={() => setShowAddPopup(false)} event={null} onSend={handleNewEvent}/>}
       <Box sx={{ width: "70vw" }}>
         <FullCalendar
           plugins={[timeGridPlugin, dayGridPlugin]}
@@ -55,7 +81,7 @@ export default function Calendar(props: { termine: any }) {
               weekends: false  
             }
           }}
-          events={props.termine}
+          events={events}
           eventClick={(info) => {openEventDetails(info)}}
         />
     
