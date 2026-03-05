@@ -16,7 +16,7 @@ MODULES = {
 }
 
 # BLÖCKE
-BLOCKS = ["BlockA", "BlockB", "BlockC"]
+BLOCKS = ["A", "B", "C"]
 
 # KURSE = Modul + Block
 COURSES = [
