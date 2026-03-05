@@ -16,25 +16,26 @@ export default function AddPopup({
   const [startDate, setStartDate] = useState(new Date());
   const [endDate, setEndDate] = useState(startDate);
   const [modul, setModul] = useState("");
-  const [trainer, setTrainer] = useState("");
-  const [group, setGroup] = useState("");
+  const [trainer, setTrainer] = useState<string[]>([]);
+  const [group, setGroup] =  useState<string[]>([]);
 
   const modules = [{ label: "Modul 1" }, { label: "Modul 2" }];
   const trainers = [{ label: "Trainer 1" }, { label: "Trainer 2" }];
-  const groups = [{ label: "Gruppe 1" }, { label: "Gruppe 2" }];
+  const groups = [{ label: "Gruppe 1", value: "1" }, { label: "Gruppe 2", value: "2" }, { label: "Gruppe 3", value: "3" }];
 
   function saveEvent() {
     const newEvent = {
       title: modul,
-      start: startDate.toDateString().split("T"),
-      end: endDate.toDateString().split("T"),
+      start: startDate.setHours(8, 0, 0, 0),
+      end: endDate.setHours(16, 30, 0, 0),
       extendedProps: {
-        trainer: [trainer],
+        trainer: trainer,
         group: group,
       },
     };
     onSend(newEvent);
     console.log("Neuer Kurs:", newEvent);
+    onClose();
   }
 
   return (
@@ -104,16 +105,22 @@ export default function AddPopup({
             options={trainers}
             sx={{ width: 300 }}
             renderInput={(params) => <TextField {...params} label="Trainer" />}
-            onChange={(value: any) => setTrainer(value.target.innerText)}
+            onChange={(_, newValue) => {
+              // Hier ziehen wir nur die Labels heraus:
+              setTrainer(newValue.map((option) => option.label));
+            }}
           />
         </div>
         <div>
           <Autocomplete
+            multiple
             disablePortal
             options={groups}
             sx={{ width: 300 }}
             renderInput={(params) => <TextField {...params} label="Group" />}
-            onChange={(value: any) => setGroup(value.target.innerText)}
+            onChange={(_, newValue) => {
+              setGroup(newValue.map((option) => option.value));
+            }}
           />
         </div>
         <Button

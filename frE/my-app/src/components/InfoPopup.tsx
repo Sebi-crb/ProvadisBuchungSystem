@@ -1,5 +1,5 @@
 import { Box } from "@mui/material";
-
+import { useNavigate } from "react-router-dom";
 
 export default function Popup({
   onClose,
@@ -8,7 +8,9 @@ export default function Popup({
   onClose: () => void;
   event: any;
 }) {
+  const navigate = useNavigate();
 
+  console.log("infopopup", event);
   return (
     <>
       <Box
@@ -42,24 +44,51 @@ export default function Popup({
       >
         <h2>{event?.title}</h2>
         <div style={{ float: "right", marginRight: "5vw" }}>
-          <h4>Trainer:</h4>
-          {event?.extendedProps?.trainer?.map((trainer: any) => (
-            <p>{trainer}</p>
-          ))}
+          <h4
+            onClick={() => navigate("/trainers")}
+            style={{
+              cursor: "pointer",
+              color: "#1976d2",
+              display: "inline-block",
+              textDecoration: "underline",
+            }}
+            onMouseOver={(e) => (e.currentTarget.style.textDecoration = "none")}
+            onMouseOut={(e) =>
+              (e.currentTarget.style.textDecoration = "underline")
+            }
+          >
+            Trainer:
+          </h4>
+          {event?.extendedProps?.trainer?.map(
+            (trainerName: string, index: number) => (
+              <p key={index}>{trainerName}</p>
+            ),
+          )}
         </div>
         <div style={{ float: "left", marginLeft: "5vw" }}>
-          <h4>Azubis:</h4>
+          <h4
+            onClick={() => navigate("/azubis")}
+            style={{
+              cursor: "pointer",
+              color: "#1976d2",
+              display: "inline-block",
+              textDecoration: "underline",
+            }}
+            onMouseOver={(e) => (e.currentTarget.style.textDecoration = "none")}
+            onMouseOut={(e) =>
+              (e.currentTarget.style.textDecoration = "underline")
+            }
+          >
+            Gruppe:
+          </h4>
           <div>
-            {event?.extendedProps?.gruppe?.azubis.map((azubi: any) => (
-              <p style={{ margin: 0 }}>{azubi.name}</p>
-            ))}
+            <p>{event?.extendedProps?.group?.join(", ")}</p>{" "}
           </div>
         </div>
+        <div>Raum: {event?.extendedProps?.raum}</div>
         <div>
-            Raum: {event?.extendedProps?.raum}
-        </div>
-        <div>
-            Zeitspanne: {event?.startStr.split("T")[0]} - {event?.endStr.split("T")[0]}
+          Zeitspanne: {event?.startStr.split("T")[0]} -{" "}
+          {event?.endStr.split("T")[0]}
         </div>
       </Box>
     </>

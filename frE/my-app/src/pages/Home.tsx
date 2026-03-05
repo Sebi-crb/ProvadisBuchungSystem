@@ -7,7 +7,7 @@ import data from "../responses/Homepage.json";
 export default function Home() {
   const navigate = useNavigate();
     console.log(data);
-    let termine = data.termine
+    let termine = data.termine;
   return (
     <div>
       <Drawer
@@ -39,7 +39,7 @@ export default function Home() {
         </Button>
       </Drawer>
 
-      <Calendar termine={termine} />
+      <Calendar termine={termine} gruppen={data.Gruppen} />
     </div>
   );
 }
