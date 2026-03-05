@@ -1,0 +1,22 @@
+Aufgabe: Azubi Info Page erstellen
+
+Resourcen: azubiPageSrc.json findest du unter fre/src/responses/
+
+Beschreibung:
+    Ich hab dir eine json erzeugt wie die daten echten daten dann unggefähr aussehen könnten.
+    Du sollst anzeigen welcher azubi zu welcher gruppe gehört und dabei irgendwie die zusätzlichen Daten schön anzeigen.
+
+    Bau das auf der pages/Azubi.tsx, ich hatte da was reingeklatsch aber kannst alles überschreiben  in der Datei.
+
+    Du hast ingesamt pro Jahr 250 Azubis also ingesamt 750.
+    Weil das bissl viel is war mein gedanke das du vll so tabs von den gruppen machst oder so, wo dann nur erstmal
+    die namen der azubis anzgeigt werden.
+    Wenn man einen dann anlclickt öffnet sich ein popup oder so wo sein daten drin sind.
+
+    Aber mir eig egal wie du machst
+
+    Die Azubis haben abgeschlossene Module, dafür gibt es noch eine seite /modules die du auch bauen sollst.
+
+    Auf der Azubi page soll dann entweder ein button sein der zur modules page führt,
+    oder was noch krasser wäre, wenn jedes der abgeschlossene modulen der azubis durch einen click
+    auf die modules page führt und ann auch direkt dann genau richtige modul anzeigt.

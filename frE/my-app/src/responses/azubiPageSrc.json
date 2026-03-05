@@ -1,0 +1,799 @@
+{
+  "//": "die zahl da is die id der gruppen",
+  "Gruppen": {
+    "1": {
+      "azubis": [
+        {
+          "id": 1,
+          "name": "Max Mustermann",
+          "unternehmen": "Musterfirma GmbH",
+          "abgeschlosseneModule": ["1", "5"],
+          "ausbildungsjahr": "1"
+        },
+        {
+          "id": 2,
+          "name": "Laura Schneider",
+          "unternehmen": "Tech Solutions AG",
+          "abgeschlosseneModule": ["1", "2", "3"],
+          "ausbildungsjahr": "1"
+        },
+        {
+          "id": 3,
+          "name": "Jonas Weber",
+          "unternehmen": "Digital Works GmbH",
+          "abgeschlosseneModule": ["1"],
+          "ausbildungsjahr": "1"
+        },
+        {
+          "id": 4,
+          "name": "Sophie Braun",
+          "unternehmen": "Innovatech KG",
+          "abgeschlosseneModule": ["1", "2", "4", "5"],
+          "ausbildungsjahr": "1"
+        },
+        {
+          "id": 5,
+          "name": "Tobias Lange",
+          "unternehmen": "ByteForge GmbH",
+          "abgeschlosseneModule": ["1", "2"],
+          "ausbildungsjahr": "1"
+        },
+        {
+          "id": 6,
+          "name": "Hannah Vogt",
+          "unternehmen": "Systemhaus Nord GmbH",
+          "abgeschlosseneModule": ["1", "3"],
+          "ausbildungsjahr": "1"
+        },
+        {
+          "id": 7,
+          "name": "Elias Kramer",
+          "unternehmen": "Musterfirma GmbH",
+          "abgeschlosseneModule": ["1", "2", "5"],
+          "ausbildungsjahr": "1"
+        },
+        {
+          "id": 8,
+          "name": "Mia Hofmann",
+          "unternehmen": "Tech Solutions AG",
+          "abgeschlosseneModule": ["1"],
+          "ausbildungsjahr": "1"
+        },
+        {
+          "id": 9,
+          "name": "Ben Schreiber",
+          "unternehmen": "Innovatech KG",
+          "abgeschlosseneModule": ["1", "2", "3", "7"],
+          "ausbildungsjahr": "1"
+        },
+        {
+          "id": 10,
+          "name": "Clara Zimmermann",
+          "unternehmen": "Digital Works GmbH",
+          "abgeschlosseneModule": ["1", "5", "7"],
+          "ausbildungsjahr": "1"
+        },
+        {
+          "id": 11,
+          "name": "Lukas Hartmann",
+          "unternehmen": "ByteForge GmbH",
+          "abgeschlosseneModule": ["1", "2"],
+          "ausbildungsjahr": "1"
+        },
+        {
+          "id": 12,
+          "name": "Nina Peters",
+          "unternehmen": "Systemhaus Nord GmbH",
+          "abgeschlosseneModule": ["1", "3", "7"],
+          "ausbildungsjahr": "1"
+        },
+        {
+          "id": 13,
+          "name": "Finn Bergmann",
+          "unternehmen": "Musterfirma GmbH",
+          "abgeschlosseneModule": ["1"],
+          "ausbildungsjahr": "1"
+        },
+        {
+          "id": 14,
+          "name": "Lea Roth",
+          "unternehmen": "Tech Solutions AG",
+          "abgeschlosseneModule": ["1", "2", "4"],
+          "ausbildungsjahr": "1"
+        },
+        {
+          "id": 15,
+          "name": "David Sommer",
+          "unternehmen": "Innovatech KG",
+          "abgeschlosseneModule": ["1", "5"],
+          "ausbildungsjahr": "1"
+        },
+        {
+          "id": 16,
+          "name": "Sarah Krause",
+          "unternehmen": "Digital Works GmbH",
+          "abgeschlosseneModule": ["1", "2", "3"],
+          "ausbildungsjahr": "1"
+        },
+        {
+          "id": 17,
+          "name": "Moritz Fuchs",
+          "unternehmen": "ByteForge GmbH",
+          "abgeschlosseneModule": ["1", "7"],
+          "ausbildungsjahr": "1"
+        }
+      ]
+    },
+    "2": {
+      "azubis": [
+        {
+          "id": 18,
+          "name": "Lena Fischer",
+          "unternehmen": "Musterfirma GmbH",
+          "abgeschlosseneModule": ["1", "2", "3", "5", "6"],
+          "ausbildungsjahr": "2"
+        },
+        {
+          "id": 19,
+          "name": "Tim Hoffmann",
+          "unternehmen": "ByteForge GmbH",
+          "abgeschlosseneModule": ["1", "2", "3", "4"],
+          "ausbildungsjahr": "2"
+        },
+        {
+          "id": 20,
+          "name": "Anna Müller",
+          "unternehmen": "Systemhaus Nord GmbH",
+          "abgeschlosseneModule": ["1", "2", "3", "4", "5", "6", "7"],
+          "ausbildungsjahr": "2"
+        },
+        {
+          "id": 21,
+          "name": "Felix Wagner",
+          "unternehmen": "Tech Solutions AG",
+          "abgeschlosseneModule": ["1", "2"],
+          "ausbildungsjahr": "2"
+        },
+        {
+          "id": 22,
+          "name": "Katharina Brandt",
+          "unternehmen": "Innovatech KG",
+          "abgeschlosseneModule": ["1", "2", "3", "5", "7"],
+          "ausbildungsjahr": "2"
+        },
+        {
+          "id": 23,
+          "name": "Nico Wolff",
+          "unternehmen": "Digital Works GmbH",
+          "abgeschlosseneModule": ["1", "2", "4", "6"],
+          "ausbildungsjahr": "2"
+        },
+        {
+          "id": 24,
+          "name": "Jana Dietrich",
+          "unternehmen": "Musterfirma GmbH",
+          "abgeschlosseneModule": ["1", "2", "3", "4", "5"],
+          "ausbildungsjahr": "2"
+        },
+        {
+          "id": 25,
+          "name": "Simon Keller",
+          "unternehmen": "ByteForge GmbH",
+          "abgeschlosseneModule": ["1", "2", "3", "7"],
+          "ausbildungsjahr": "2"
+        },
+        {
+          "id": 26,
+          "name": "Alina Schwarz",
+          "unternehmen": "Systemhaus Nord GmbH",
+          "abgeschlosseneModule": ["1", "2", "5", "6", "7"],
+          "ausbildungsjahr": "2"
+        },
+        {
+          "id": 27,
+          "name": "Philipp Maier",
+          "unternehmen": "Tech Solutions AG",
+          "abgeschlosseneModule": ["1", "2", "3", "4", "6"],
+          "ausbildungsjahr": "2"
+        },
+        {
+          "id": 28,
+          "name": "Vanessa König",
+          "unternehmen": "Innovatech KG",
+          "abgeschlosseneModule": ["1", "2", "3"],
+          "ausbildungsjahr": "2"
+        },
+        {
+          "id": 29,
+          "name": "Dominik Arnold",
+          "unternehmen": "Digital Works GmbH",
+          "abgeschlosseneModule": ["1", "2", "4", "5", "7"],
+          "ausbildungsjahr": "2"
+        },
+        {
+          "id": 30,
+          "name": "Lisa Baumann",
+          "unternehmen": "Musterfirma GmbH",
+          "abgeschlosseneModule": ["1", "2", "3", "5"],
+          "ausbildungsjahr": "2"
+        },
+        {
+          "id": 31,
+          "name": "Markus Franke",
+          "unternehmen": "ByteForge GmbH",
+          "abgeschlosseneModule": ["1", "2", "6", "7"],
+          "ausbildungsjahr": "2"
+        },
+        {
+          "id": 32,
+          "name": "Celine Böhm",
+          "unternehmen": "Systemhaus Nord GmbH",
+          "abgeschlosseneModule": ["1", "2", "3", "4", "5", "6"],
+          "ausbildungsjahr": "2"
+        },
+        {
+          "id": 33,
+          "name": "Patrick Engel",
+          "unternehmen": "Tech Solutions AG",
+          "abgeschlosseneModule": ["1", "2", "3", "4", "7"],
+          "ausbildungsjahr": "2"
+        },
+        {
+          "id": 34,
+          "name": "Isabell Werner",
+          "unternehmen": "Innovatech KG",
+          "abgeschlosseneModule": ["1", "2", "5", "7"],
+          "ausbildungsjahr": "2"
+        },
+        {
+          "id": 35,
+          "name": "Fabian Krohn",
+          "unternehmen": "Digital Works GmbH",
+          "abgeschlosseneModule": ["1", "2", "3", "6"],
+          "ausbildungsjahr": "2"
+        }
+      ]
+    },
+    "3": {
+      "azubis": [
+        {
+          "id": 36,
+          "name": "Marie Klein",
+          "unternehmen": "Digital Works GmbH",
+          "abgeschlosseneModule": ["1", "2", "3", "4", "5", "6", "7", "8", "9"],
+          "ausbildungsjahr": "3"
+        },
+        {
+          "id": 37,
+          "name": "Paul Richter",
+          "unternehmen": "Innovatech KG",
+          "abgeschlosseneModule": ["1", "2", "3", "4", "5", "6", "7", "8"],
+          "ausbildungsjahr": "3"
+        },
+        {
+          "id": 38,
+          "name": "Julia Becker",
+          "unternehmen": "ByteForge GmbH",
+          "abgeschlosseneModule": [
+            "1",
+            "2",
+            "3",
+            "4",
+            "5",
+            "6",
+            "7",
+            "8",
+            "9",
+            "10"
+          ],
+          "ausbildungsjahr": "3"
+        },
+        {
+          "id": 39,
+          "name": "Niklas Schulz",
+          "unternehmen": "Systemhaus Nord GmbH",
+          "abgeschlosseneModule": ["1", "2", "3", "4", "5", "6"],
+          "ausbildungsjahr": "3"
+        },
+        {
+          "id": 40,
+          "name": "Teresa Huber",
+          "unternehmen": "Musterfirma GmbH",
+          "abgeschlosseneModule": ["1", "2", "3", "4", "5", "6", "7", "9"],
+          "ausbildungsjahr": "3"
+        },
+        {
+          "id": 41,
+          "name": "Kevin Neumann",
+          "unternehmen": "Tech Solutions AG",
+          "abgeschlosseneModule": ["1", "2", "3", "4", "5", "7", "8", "11"],
+          "ausbildungsjahr": "3"
+        },
+        {
+          "id": 42,
+          "name": "Sandra Otto",
+          "unternehmen": "Digital Works GmbH",
+          "abgeschlosseneModule": [
+            "1",
+            "2",
+            "3",
+            "4",
+            "5",
+            "6",
+            "7",
+            "8",
+            "9",
+            "11"
+          ],
+          "ausbildungsjahr": "3"
+        },
+        {
+          "id": 43,
+          "name": "Florian Kraus",
+          "unternehmen": "Innovatech KG",
+          "abgeschlosseneModule": ["1", "2", "3", "4", "5", "6", "8"],
+          "ausbildungsjahr": "3"
+        },
+        {
+          "id": 44,
+          "name": "Stephanie Lorenz",
+          "unternehmen": "ByteForge GmbH",
+          "abgeschlosseneModule": ["1", "2", "3", "4", "5", "6", "7"],
+          "ausbildungsjahr": "3"
+        },
+        {
+          "id": 45,
+          "name": "Christian Haas",
+          "unternehmen": "Systemhaus Nord GmbH",
+          "abgeschlosseneModule": [
+            "1",
+            "2",
+            "3",
+            "4",
+            "5",
+            "6",
+            "7",
+            "8",
+            "9",
+            "10",
+            "11"
+          ],
+          "ausbildungsjahr": "3"
+        },
+        {
+          "id": 46,
+          "name": "Melanie Günther",
+          "unternehmen": "Musterfirma GmbH",
+          "abgeschlosseneModule": ["1", "2", "3", "4", "5", "6", "9"],
+          "ausbildungsjahr": "3"
+        },
+        {
+          "id": 47,
+          "name": "Steffen Albrecht",
+          "unternehmen": "Tech Solutions AG",
+          "abgeschlosseneModule": ["1", "2", "3", "4", "5", "6", "7", "8"],
+          "ausbildungsjahr": "3"
+        },
+        {
+          "id": 48,
+          "name": "Nadine Zimmer",
+          "unternehmen": "Digital Works GmbH",
+          "abgeschlosseneModule": ["1", "2", "3", "4", "5", "7", "8", "9"],
+          "ausbildungsjahr": "3"
+        },
+        {
+          "id": 49,
+          "name": "Bastian Seidel",
+          "unternehmen": "Innovatech KG",
+          "abgeschlosseneModule": ["1", "2", "3", "4", "5", "6", "7", "10"],
+          "ausbildungsjahr": "3"
+        },
+        {
+          "id": 50,
+          "name": "Jennifer Graf",
+          "unternehmen": "ByteForge GmbH",
+          "abgeschlosseneModule": ["1", "2", "3", "4", "5", "6", "8", "11"],
+          "ausbildungsjahr": "3"
+        },
+        {
+          "id": 51,
+          "name": "Oliver Pfeiffer",
+          "unternehmen": "Systemhaus Nord GmbH",
+          "abgeschlosseneModule": [
+            "1",
+            "2",
+            "3",
+            "4",
+            "5",
+            "6",
+            "7",
+            "9",
+            "10"
+          ],
+          "ausbildungsjahr": "3"
+        }
+      ]
+    },
+    "4": {
+      "azubis": [
+        {
+          "id": 52,
+          "name": "Christoph Bauer",
+          "unternehmen": "Musterfirma GmbH",
+          "abgeschlosseneModule": [
+            "1",
+            "2",
+            "3",
+            "4",
+            "5",
+            "6",
+            "7",
+            "8",
+            "9",
+            "10",
+            "11"
+          ],
+          "ausbildungsjahr": "3"
+        },
+        {
+          "id": 53,
+          "name": "Tanja Stein",
+          "unternehmen": "Tech Solutions AG",
+          "abgeschlosseneModule": ["1", "2", "3", "4", "5", "6", "7", "8", "9"],
+          "ausbildungsjahr": "3"
+        },
+        {
+          "id": 54,
+          "name": "René Kühn",
+          "unternehmen": "Digital Works GmbH",
+          "abgeschlosseneModule": [
+            "1",
+            "2",
+            "3",
+            "4",
+            "5",
+            "6",
+            "7",
+            "9",
+            "10",
+            "11"
+          ],
+          "ausbildungsjahr": "3"
+        },
+        {
+          "id": 55,
+          "name": "Bianca Voigt",
+          "unternehmen": "Innovatech KG",
+          "abgeschlosseneModule": ["1", "2", "3", "4", "5", "6", "8", "9"],
+          "ausbildungsjahr": "3"
+        },
+        {
+          "id": 56,
+          "name": "Dennis Schmitt",
+          "unternehmen": "ByteForge GmbH",
+          "abgeschlosseneModule": [
+            "1",
+            "2",
+            "3",
+            "4",
+            "5",
+            "6",
+            "7",
+            "8",
+            "10",
+            "11"
+          ],
+          "ausbildungsjahr": "3"
+        },
+        {
+          "id": 57,
+          "name": "Franziska Wolf",
+          "unternehmen": "Systemhaus Nord GmbH",
+          "abgeschlosseneModule": [
+            "1",
+            "2",
+            "3",
+            "4",
+            "5",
+            "7",
+            "8",
+            "9",
+            "10"
+          ],
+          "ausbildungsjahr": "3"
+        },
+        {
+          "id": 58,
+          "name": "Markus Lehmann",
+          "unternehmen": "Musterfirma GmbH",
+          "abgeschlosseneModule": [
+            "1",
+            "2",
+            "3",
+            "4",
+            "5",
+            "6",
+            "7",
+            "8",
+            "9",
+            "10",
+            "11"
+          ],
+          "ausbildungsjahr": "3"
+        },
+        {
+          "id": 59,
+          "name": "Sabine Weiß",
+          "unternehmen": "Tech Solutions AG",
+          "abgeschlosseneModule": ["1", "2", "3", "4", "5", "6", "7", "9"],
+          "ausbildungsjahr": "3"
+        },
+        {
+          "id": 60,
+          "name": "Thomas Kiefer",
+          "unternehmen": "Digital Works GmbH",
+          "abgeschlosseneModule": [
+            "1",
+            "2",
+            "3",
+            "4",
+            "5",
+            "6",
+            "8",
+            "9",
+            "10"
+          ],
+          "ausbildungsjahr": "3"
+        },
+        {
+          "id": 61,
+          "name": "Anja Bergmann",
+          "unternehmen": "Innovatech KG",
+          "abgeschlosseneModule": [
+            "1",
+            "2",
+            "3",
+            "4",
+            "5",
+            "6",
+            "7",
+            "8",
+            "9",
+            "10",
+            "11"
+          ],
+          "ausbildungsjahr": "3"
+        },
+        {
+          "id": 62,
+          "name": "Stefan Dietze",
+          "unternehmen": "ByteForge GmbH",
+          "abgeschlosseneModule": ["1", "2", "3", "4", "5", "7", "9", "10"],
+          "ausbildungsjahr": "3"
+        },
+        {
+          "id": 63,
+          "name": "Petra Hoffmann",
+          "unternehmen": "Systemhaus Nord GmbH",
+          "abgeschlosseneModule": [
+            "1",
+            "2",
+            "3",
+            "4",
+            "5",
+            "6",
+            "7",
+            "8",
+            "11"
+          ],
+          "ausbildungsjahr": "3"
+        },
+        {
+          "id": 64,
+          "name": "Michael Lang",
+          "unternehmen": "Musterfirma GmbH",
+          "abgeschlosseneModule": [
+            "1",
+            "2",
+            "3",
+            "4",
+            "5",
+            "6",
+            "7",
+            "8",
+            "9",
+            "10"
+          ],
+          "ausbildungsjahr": "3"
+        },
+        {
+          "id": 65,
+          "name": "Verena Moser",
+          "unternehmen": "Tech Solutions AG",
+          "abgeschlosseneModule": [
+            "1",
+            "2",
+            "3",
+            "4",
+            "5",
+            "6",
+            "8",
+            "9",
+            "11"
+          ],
+          "ausbildungsjahr": "3"
+        },
+        {
+          "id": 66,
+          "name": "Andreas Riedel",
+          "unternehmen": "Digital Works GmbH",
+          "abgeschlosseneModule": [
+            "1",
+            "2",
+            "3",
+            "4",
+            "5",
+            "6",
+            "7",
+            "8",
+            "9",
+            "10",
+            "11"
+          ],
+          "ausbildungsjahr": "3"
+        },
+        {
+          "id": 67,
+          "name": "Claudia Stark",
+          "unternehmen": "Innovatech KG",
+          "abgeschlosseneModule": [
+            "1",
+            "2",
+            "3",
+            "4",
+            "5",
+            "6",
+            "7",
+            "9",
+            "10"
+          ],
+          "ausbildungsjahr": "3"
+        },
+        {
+          "id": 68,
+          "name": "Jörg Schubert",
+          "unternehmen": "ByteForge GmbH",
+          "abgeschlosseneModule": [
+            "1",
+            "2",
+            "3",
+            "4",
+            "5",
+            "6",
+            "7",
+            "8",
+            "9",
+            "11"
+          ],
+          "ausbildungsjahr": "3"
+        },
+        {
+          "id": 69,
+          "name": "Martina Böhme",
+          "unternehmen": "Systemhaus Nord GmbH",
+          "abgeschlosseneModule": [
+            "1",
+            "2",
+            "3",
+            "4",
+            "5",
+            "6",
+            "7",
+            "8",
+            "10",
+            "11"
+          ],
+          "ausbildungsjahr": "3"
+        }
+      ]
+    }
+  },
+  "Module": {
+    "1": {
+      "title": "Softwareentwicklung",
+      "dauer": 5,
+      "beschreibung": "Grundlagen der Softwareentwicklung, inklusive Programmierung, Versionskontrolle und Best Practices.",
+      "brauchtPC": true,
+      "anzahlTrainer": 2,
+      "vorgaengerModule": []
+    },
+    "2": {
+      "title": "Netzwerktechnik Basics",
+      "dauer": 2,
+      "beschreibung": "Einführung in Netzwerktechnik, inklusive Konfiguration und Fehlerbehebung.",
+      "brauchtPC": false,
+      "anzahlTrainer": 1,
+      "vorgaengerModule": ["1"]
+    },
+    "3": {
+      "title": "Datenbankmanagement",
+      "dauer": 3,
+      "beschreibung": "Grundlagen relationaler Datenbanken, SQL-Abfragen, Datenbankdesign und Normalisierung.",
+      "brauchtPC": true,
+      "anzahlTrainer": 1,
+      "vorgaengerModule": ["1"]
+    },
+    "4": {
+      "title": "IT-Sicherheit Grundlagen",
+      "dauer": 2,
+      "beschreibung": "Einführung in Cybersecurity, Bedrohungsanalyse, Verschlüsselung und sichere Systeme.",
+      "brauchtPC": false,
+      "anzahlTrainer": 1,
+      "vorgaengerModule": ["2"]
+    },
+    "5": {
+      "title": "Webentwicklung Frontend",
+      "dauer": 4,
+      "beschreibung": "HTML, CSS und JavaScript für moderne Benutzeroberflächen, inklusive responsivem Design.",
+      "brauchtPC": true,
+      "anzahlTrainer": 2,
+      "vorgaengerModule": ["1"]
+    },
+    "6": {
+      "title": "Cloud Computing",
+      "dauer": 3,
+      "beschreibung": "Grundlagen von Cloud-Infrastrukturen, Diensten und Deployment-Strategien (AWS, Azure, GCP).",
+      "brauchtPC": true,
+      "anzahlTrainer": 1,
+      "vorgaengerModule": ["2", "3"]
+    },
+    "7": {
+      "title": "Projektmanagement & Agile",
+      "dauer": 2,
+      "beschreibung": "Scrum, Kanban und klassisches Projektmanagement für IT-Projekte im Ausbildungskontext.",
+      "brauchtPC": false,
+      "anzahlTrainer": 1,
+      "vorgaengerModule": []
+    },
+    "8": {
+      "title": "Linux & Systemadministration",
+      "dauer": 3,
+      "beschreibung": "Umgang mit Linux-Betriebssystemen, Shell-Scripting, Rechteverwaltung und Serveradministration.",
+      "brauchtPC": true,
+      "anzahlTrainer": 2,
+      "vorgaengerModule": ["2"]
+    },
+    "9": {
+      "title": "Backend-Entwicklung & APIs",
+      "dauer": 4,
+      "beschreibung": "Entwicklung von REST-APIs und Backend-Logik mit Node.js oder Python, inklusive Authentifizierung.",
+      "brauchtPC": true,
+      "anzahlTrainer": 2,
+      "vorgaengerModule": ["1", "3"]
+    },
+    "10": {
+      "title": "DevOps & CI/CD",
+      "dauer": 3,
+      "beschreibung": "Automatisierung von Build- und Deployment-Prozessen mit Docker, GitHub Actions und Pipelines.",
+      "brauchtPC": true,
+      "anzahlTrainer": 1,
+      "vorgaengerModule": ["6", "8"]
+    },
+    "11": {
+      "title": "IT-Recht & Datenschutz",
+      "dauer": 1,
+      "beschreibung": "Grundlagen des IT-Rechts, DSGVO, Lizenzmodelle und rechtliche Rahmenbedingungen im Berufsalltag.",
+      "brauchtPC": false,
+      "anzahlTrainer": 1,
+      "vorgaengerModule": []
+    },
+    "12": {
+      "title": "Abschlussprojekt",
+      "dauer": 6,
+      "beschreibung": "Eigenständige Umsetzung eines praxisnahen IT-Projekts unter Anwendung aller erlernten Kompetenzen.",
+      "brauchtPC": true,
+      "anzahlTrainer": 3,
+      "vorgaengerModule": ["5", "9", "10", "11"]
+    }
+  }
+}

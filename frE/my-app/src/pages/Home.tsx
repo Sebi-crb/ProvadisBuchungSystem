@@ -6,8 +6,8 @@ import data from "../responses/Homepage.json";
 
 export default function Home() {
   const navigate = useNavigate();
-    console.log(data);
-    let termine = data.termine;
+  console.log(data);
+  let termine = data.termine;
   return (
     <div>
       <Drawer
@@ -36,6 +36,12 @@ export default function Home() {
           sx={{ color: "white", marginTop: 5 }}
         >
           Trainer
+        </Button>
+        <Button
+          onClick={() => navigate("/modules")}
+          sx={{ color: "white", marginTop: 5 }}
+        >
+          Module
         </Button>
       </Drawer>
 
