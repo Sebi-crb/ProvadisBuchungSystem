@@ -108,10 +108,27 @@ def build_company_index(azubis):
 
 
 def set_up_groups(formated_dataArray):
-    firmen = []
-    for i in range(formated_dataArray.__len__()):
-        firmen.append(formated_dataArray.__getitem__(i))
-    print(firmen)
+    Jahrgang = []
+    Gruppe = []
+
+    print(formated_dataArray)
+
+    for firma, values in formated_dataArray.items():
+        #print(firma, values, values.__len__())
+        if((Gruppe.__len__() + values.__len__())<_max_Group_size):
+            for v in values:
+                Gruppe.append(v)
+
+        else:
+            Jahrgang.append(Gruppe)
+            Gruppe.clear()
+            for v in values:
+                Gruppe.append(v)
+        print(Gruppe)
+        #firmen.append(firma)
+
+
+    #print(firmen)
 
 
 
@@ -124,7 +141,9 @@ def main():
     C2025, C2024, C2023 = sort_Startyear(CBlock)
     #print(len(A2026), len(A2025), len(A2024))
     dumm = build_company_index(A2025)
-    set_up_groups(dumm)
+    #print(dumm)
+    #set_up_groups(dumm)
+    print(set_up_groups(dumm))
 
 if __name__ == '__main__':
     main()
