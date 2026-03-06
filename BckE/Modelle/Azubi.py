@@ -11,6 +11,7 @@ class Azubi:
     _attendedModules: list = field(default="")
     _abwesenheiten: list = field(default="")
     _block: str = field(default="")
+    _id: str = field(default="")
 
 
 
@@ -66,7 +67,6 @@ class Azubi:
     @property
     def abwesenheiten(self):
         return self._abwesenheiten
-
     @abwesenheiten.setter
     def abwesenheiten(self, abwesenheiten):
         self._abwesenheiten = abwesenheiten.strip(' ')
@@ -77,6 +77,13 @@ class Azubi:
     @block.setter
     def block(self, block):
         self._block = block.strip(' ')
+
+    @property
+    def id(self):
+        return self._id
+    @id.setter
+    def id(self, id):
+        self._id = id#.strip(' ')
 
 
 

@@ -63,8 +63,8 @@ def get_all():
     with sqlite3.connect(DB) as conn:
         cur = conn.execute("SELECT id, Name, Vorname, Ausbildungsunternehmen, StartDate, AttendedModules, Block FROM Azubi")
         rows = cur.fetchall()
-        for r in rows:
-            print(r)
+        #for r in rows:
+            #print(r)
         return rows
 
 def main():
@@ -80,4 +80,3 @@ def main():
 #    main()
 #with sqlite3.connect(DB) as conn:
 #    create_table(conn)
-get_all()

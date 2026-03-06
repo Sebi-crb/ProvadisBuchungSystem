@@ -122,7 +122,7 @@ def add_absence(id_, toAdd):
 
 
 def main():
-    import ProvadisBuchungSystem.BckE.Modelle.Trainer as Trainer
+    import BckE.Modelle.Trainer as Trainer
     with sqlite3.connect(DB) as conn:
         #create_table()
         #insert_sample(conn)
