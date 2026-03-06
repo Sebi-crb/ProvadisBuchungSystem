@@ -110,37 +110,41 @@ def build_company_index(azubis):
 def set_up_groups(formated_dataArray):
     Jahrgang = []
     Gruppe = []
-
-    print(formated_dataArray)
-
     for firma, values in formated_dataArray.items():
         #print(firma, values, values.__len__())
-        if((Gruppe.__len__() + values.__len__())<_max_Group_size):
+        if((Gruppe.__len__())<_max_Group_size):
             for v in values:
+                #print(v)
                 Gruppe.append(v)
-
         else:
             Jahrgang.append(Gruppe)
-            Gruppe.clear()
+            Gruppe = []
             for v in values:
                 Gruppe.append(v)
-        print(Gruppe)
-        #firmen.append(firma)
-
-
-    #print(firmen)
+    Jahrgang.append(Gruppe)
+    return Jahrgang
 
 
 
 def main():
+    list = {}
     list_azubis = get_Azubis()
     convertedAz = convert_db_Azubi(list_azubis)
     ABlock, BBlock, CBlock = sortBlock_Azubis(convertedAz)
     A2025, A2024, A2023 = sort_Startyear(ABlock)
     B2025, B2024, B2023 = sort_Startyear(BBlock)
     C2025, C2024, C2023 = sort_Startyear(CBlock)
-    #print(len(A2026), len(A2025), len(A2024))
-    dumm = build_company_index(A2025)
+    list.update({"A2025": A2025})
+    list.update({"A2024": A2024})
+    list.update({"A2023": A2023})
+    list.update({"B2025": B2025})
+    list.update({"B2024": B2024})
+    list.update({"B2023": B2023})
+    list.update({"C2025": C2025})
+    list.update({"C2024": C2024})
+    list.update({"C2023": C2023})
+    #dumm = build_company_index(A2025)
+
     #print(dumm)
     #set_up_groups(dumm)
     print(set_up_groups(dumm))
