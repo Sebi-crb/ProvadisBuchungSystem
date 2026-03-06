@@ -73,7 +73,7 @@ class Gruppe:
                 self._azubiList = [item.strip() for item in str(azubiList).split(',') if item.strip()]
             else:
                 self._azubiList = []
-        self.setCount()
+        #self.setCount()
 
     def setCount(self, listlength):
         #print("ef")

@@ -127,27 +127,65 @@ def set_up_groups(formated_dataArray):
 
 
 def main():
-    list = {}
+    block_list = {}
     list_azubis = get_Azubis()
     convertedAz = convert_db_Azubi(list_azubis)
     ABlock, BBlock, CBlock = sortBlock_Azubis(convertedAz)
     A2025, A2024, A2023 = sort_Startyear(ABlock)
     B2025, B2024, B2023 = sort_Startyear(BBlock)
     C2025, C2024, C2023 = sort_Startyear(CBlock)
-    list.update({"A2025": A2025})
-    list.update({"A2024": A2024})
-    list.update({"A2023": A2023})
-    list.update({"B2025": B2025})
-    list.update({"B2024": B2024})
-    list.update({"B2023": B2023})
-    list.update({"C2025": C2025})
-    list.update({"C2024": C2024})
-    list.update({"C2023": C2023})
-    #dumm = build_company_index(A2025)
+    block_list.update({"A2025": A2025})
+    block_list.update({"A2024": A2024})
+    block_list.update({"A2023": A2023})
+    block_list.update({"B2025": B2025})
+    block_list.update({"B2024": B2024})
+    block_list.update({"B2023": B2023})
+    block_list.update({"C2025": C2025})
+    block_list.update({"C2024": C2024})
+    block_list.update({"C2023": C2023})
 
+    company_indexing_list = []
+    for block, item in block_list.items():
+        #print(item)
+        company_indexing_list.append(build_company_index(item))
+
+
+    print(len(company_indexing_list))
+    year_block_group = []
+    for b in company_indexing_list:
+        #print(set_up_groups(b))
+        year_block_group.append(set_up_groups(b))
+
+    print(year_block_group[0][1])
+
+
+    #dumm = build_company_index(A2025)
     #print(dumm)
     #set_up_groups(dumm)
-    print(set_up_groups(dumm))
+    #print(set_up_groups(dumm))
+    gruppen_class = []
+    j = 0
+    for i, (block, group_azubi_list) in enumerate(year_block_group):
+
+        print(year_block_group.index(block))
+        group = Gruppe.Gruppe("", [])
+        if (i <= 2):
+            group.block = "A"
+        elif (2 < i <= 5):
+            group.block = "B"
+        else:
+            group.block = "C"
+
+        if ((i + 1) % 3 == 0):
+            group.name = "23FA0" + str(j)
+        elif ((i + 1) % 3 == 1):
+            group.block = "25FA0" + str(j)
+        else:
+            group.block = "24FA0" + str(j)
+
+        group.azubiList = group_azubi_list
+        j = j + 1
+
 
 if __name__ == '__main__':
     main()
