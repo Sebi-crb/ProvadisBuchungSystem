@@ -6,9 +6,8 @@ import IconButton from "@mui/material/IconButton";
 import Paper from "@mui/material/Paper";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import data from "../../responses/azubiPageSrc.json";
 import AzubiSearchField from "./AzubiSearchField";
 
 type Azubi = {
@@ -22,6 +21,14 @@ type Azubi = {
 const gruppen = data.Gruppen as Record<string, { azubis: Azubi[] }>;
 
 export default function AzubisPage() {
+  useEffect(() => {
+    fetch("/api/azubis")
+      .then((response) => response.json())
+      .then((data) => {
+        // Handle the fetched data
+      });
+  }, []);
+
   const [search, setSearch] = useState("");
   const navigate = useNavigate();
 
@@ -37,7 +44,7 @@ export default function AzubisPage() {
         return true;
       }
       return gruppen[gid].azubis.some((a) =>
-        a.name.toLowerCase().includes(term)
+        a.name.toLowerCase().includes(term),
       );
     });
   }, [search, gruppenIds]);
@@ -53,7 +60,11 @@ export default function AzubisPage() {
     >
       <AppBar position="sticky" sx={{ bgcolor: "#026291" }}>
         <Toolbar>
-          <IconButton color="inherit" edge="start" onClick={() => navigate("/home")}>
+          <IconButton
+            color="inherit"
+            edge="start"
+            onClick={() => navigate("/home")}
+          >
             <ArrowBackIcon />
           </IconButton>
           <Typography variant="h6" sx={{ ml: 1 }}>
@@ -62,7 +73,15 @@ export default function AzubisPage() {
         </Toolbar>
       </AppBar>
 
-      <Container maxWidth={false} sx={{ py: 3, px: { xs: 2, md: 6 }, display: "flex", justifyContent: "center" }}>
+      <Container
+        maxWidth={false}
+        sx={{
+          py: 3,
+          px: { xs: 2, md: 6 },
+          display: "flex",
+          justifyContent: "center",
+        }}
+      >
         <Box sx={{ width: "100%", maxWidth: 1100 }}>
           <AzubiSearchField
             value={search}
@@ -85,7 +104,7 @@ export default function AzubisPage() {
             {filteredGruppen.map((gid) => {
               const azubis = gruppen[gid].azubis;
               const years = Array.from(
-                new Set(azubis.map((a) => a.ausbildungsjahr))
+                new Set(azubis.map((a) => a.ausbildungsjahr)),
               ).sort();
               return (
                 <Paper

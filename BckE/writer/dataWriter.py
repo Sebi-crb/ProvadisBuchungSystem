@@ -12,7 +12,7 @@ def add_absence(start, end, id):
     invertedMap = {v: k for k, v in dayDateMap.items()}
     keyArr = []
     for day in date_range(startDate, endDate):
-        if day.weekday() >= 5: 
+        if day.weekday() >= 5:
             continue
         key = invertedMap[day.date()]
         keyArr.append(key)
