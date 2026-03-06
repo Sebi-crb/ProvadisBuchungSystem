@@ -16,34 +16,42 @@ DB_PATH = proj_root / TARGET_SUBPATH
 DB_PATH.parent.mkdir(parents=True, exist_ok=True)   # stellt sicher, dass Ordner existiert
 DB = str(DB_PATH.resolve())
 
-def create_table(conn):
-    conn.execute("""
-    CREATE TABLE IF NOT EXISTS Azubi (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        Name TEXT NOT NULL,
-        Vorname TEXT NOT NULL,
-        Ausbildungsunternehmen TEXT NOT NULL,
-        StartDate TEXT NOT NULL,
-        AttendedModules TEXT NOT NULL,
-        Block TEXT NOT NULL
-    );
-    """)
-    conn.commit()
+def create_table():
+    with sqlite3.connect(DB) as conn:
+        conn.execute("""
+        CREATE TABLE IF NOT EXISTS Azubi (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            Name TEXT NOT NULL,
+            Vorname TEXT NOT NULL,
+            Ausbildungsunternehmen TEXT NOT NULL,
+            StartDate TEXT NOT NULL,
+            AttendedModules TEXT NOT NULL,
+            Block TEXT NOT NULL
+        );
+        """)
+        conn.commit()
 
 def delete(id_):
     with sqlite3.connect(DB) as c: c.execute("DELETE FROM Azubi WHERE id=?", (id_,))
 
-def insert_sample(conn):
-    samples = [
-        ("Müller", "Anna", "Firma A", "2024", "Modul1;Modul2", "A"),
-        ("Schmidt", "Ben", "Firma B", "2025", "Modul1", "B"),
-        ("Meier", "Clara", "Firma C", "2024", "Modul2;Modul3", "A"),
-    ]
-    conn.executemany(
-        "INSERT INTO Azubi (Name, Vorname, Ausbildungsunternehmen, StartDate, AttendedModules, Block) VALUES (?, ?, ?, ?, ?, ?)",
-        samples
-    )
-    conn.commit()
+def insert_sample():
+    with sqlite3.connect(DB) as conn:
+        samples = [
+            ("Müller", "Anna", "Firma A", "2024", "Modul1;Modul2", "A"),
+            ("Schmidt", "Ben", "Firma B", "2025", "Modul1", "B"),
+            ("Meier", "Clara", "Firma C", "2024", "Modul2;Modul3", "A"),
+        ]
+        conn.executemany(
+            "INSERT INTO Azubi (Name, Vorname, Ausbildungsunternehmen, StartDate, AttendedModules, Block) VALUES (?, ?, ?, ?, ?, ?)",
+            samples
+        )
+        conn.commit()
+
+def drop_table():
+    with sqlite3.connect(DB) as conn:
+        conn.execute("DROP TABLE IF EXISTS Azubi")
+        conn.commit()
+
 
 def insert_Azubi(Azubi):
     with sqlite3.connect(DB) as conn:
@@ -75,8 +83,9 @@ def main():
         #insert_Azubi(azubi)
         print("Aktuelle Einträge in Azubi:")
         get_all()
-
+#drop_table()
+print(get_all())
 #if __name__ == "__main__":
-#    main()
+    #main()
 #with sqlite3.connect(DB) as conn:
 #    create_table(conn)

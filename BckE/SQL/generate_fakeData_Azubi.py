@@ -20,7 +20,7 @@ class Generate_Fake_Data:
         Azubi.lehrjahr = str(random.randint(1, 3))
         Azubi.block = random.choice(["A", "B", "C"])
         Azubi.attendedModules = [random.choice(["1", "2", "3", ]), random.choice(["4", "5", "6", "7"]), random.choice(["8", "9", "10", "11",])]
-        Azubi.ausbildungsStart = random.choice([y := __import__("datetime").date.today().year, y-1, y-2])
+        Azubi.ausbildungsStart = random.choice(["2025", "2024", "2023"])
 
         return Azubi
 
@@ -46,6 +46,7 @@ class Generate_Fake_Data:
 
 
 if(__name__ == "__main__"):
+    SQL_Azubi.create_table()
     #GFD = Generate_Fake_Data()
     #liste = GFD.generate_addresses(10)
     GFD = Generate_Fake_Data()
@@ -53,7 +54,7 @@ if(__name__ == "__main__"):
     for az in a_list:
         SQL_Azubi.insert_Azubi(az)
     #print(SQL_Azubi.print_all())
-    SQL_Azubi.print_all()
+    SQL_Azubi.get_all()
     #for Azubi in liste:
         #print(Azubi., end="\n\n ")
         #print(Azubi)

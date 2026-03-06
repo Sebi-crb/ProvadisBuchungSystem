@@ -77,11 +77,11 @@ def sort_Startyear(formated_dataArray):
 
     for azubi in formated_dataArray:
         #print(azubi.ausbildungsStart)
-        if(azubi.ausbildungsStart == "2026"):
+        if(azubi.ausbildungsStart == "2025"):
             year1Azubis.append(azubi)
-        elif(azubi.ausbildungsStart == "2025"):
-            year2Azubis.append(azubi)
         elif(azubi.ausbildungsStart == "2024"):
+            year2Azubis.append(azubi)
+        elif(azubi.ausbildungsStart == "2023"):
             year3Azubis.append(azubi)
     return year1Azubis,year2Azubis,year3Azubis
 
@@ -107,6 +107,11 @@ def build_company_index(azubis):
     return dict(Firmen)
 
 
+def set_up_groups(formated_dataArray):
+    firmen = []
+    for i in range(formated_dataArray.__len__()):
+        firmen.append(formated_dataArray.__getitem__(i))
+    print(firmen)
 
 
 
@@ -114,11 +119,13 @@ def main():
     list_azubis = get_Azubis()
     convertedAz = convert_db_Azubi(list_azubis)
     ABlock, BBlock, CBlock = sortBlock_Azubis(convertedAz)
-    A2026, A2025, A2024 = sort_Startyear(ABlock)
-    B2026, B2025, B2024 = sort_Startyear(BBlock)
-    C2026, C2025, C2024 = sort_Startyear(CBlock)
-    print(len(A2026), len(A2025), len(A2024))
-    build_company_index(A2026)
+    A2025, A2024, A2023 = sort_Startyear(ABlock)
+    B2025, B2024, B2023 = sort_Startyear(BBlock)
+    C2025, C2024, C2023 = sort_Startyear(CBlock)
+    #print(len(A2026), len(A2025), len(A2024))
+    dumm = build_company_index(A2025)
+    set_up_groups(dumm)
+
 if __name__ == '__main__':
     main()
 #print(convert_db_Azubi(list_azubis))
