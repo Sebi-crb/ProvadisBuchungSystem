@@ -8,6 +8,7 @@ import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import data from "../../responses/azubiPageSrc.json";
 import AzubiSearchField from "./AzubiSearchField";
 
 type Azubi = {
