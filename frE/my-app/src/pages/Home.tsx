@@ -10,7 +10,7 @@ export default function Home() {
   let termine = data.termine;
   return (
 <Box sx={{ display: "flex", flexDirection: "row" }}>
-  <Calendar termine={termine} gruppen={data.gruppen} />
+  <Calendar termine={termine} gruppen={data.Gruppen} />
   <Sidebar />
 </Box>
   );
