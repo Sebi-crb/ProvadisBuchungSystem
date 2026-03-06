@@ -88,7 +88,7 @@ export default function Calendar(props: { termine: any, gruppen: any }) {
           onSend={handleNewEvent}
         />
       )}
-      <Box sx={{ width: "70vw" }}>
+      <Box sx={{ width: "70vw", float: "left", padding: 2 }}>
         <FullCalendar
           plugins={[timeGridPlugin, dayGridPlugin]}
           initialView="dayGridMonth"

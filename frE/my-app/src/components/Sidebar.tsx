@@ -6,14 +6,17 @@ export default function Sidebar() {
     const navigate = useNavigate();
 
   return (
+    <div  style={{ width: "180px" }}>
       <Drawer
         variant="permanent"
         anchor="right"
         sx={{
           "& .MuiDrawer-paper": {
-            width: "10vw",
+            width: "180px",
+            flexShrink: 0,
             color: "white",
             backgroundColor: "#026291",
+            boxSizing: "border-box",
           },
           color: "white",
         }}
@@ -40,5 +43,6 @@ export default function Sidebar() {
           Module
         </Button>
       </Drawer>
+      </div>
   );
 }

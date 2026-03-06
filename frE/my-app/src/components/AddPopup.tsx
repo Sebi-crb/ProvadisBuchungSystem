@@ -20,7 +20,7 @@ export default function AddPopup({
   const [group, setGroup] = useState<string[]>([]);
 
   const modules = [{ label: "Modul 1" }, { label: "Modul 2" }];
-  const trainerOptions = [];
+  const [trainerOptions, setTrainerOptions] = useState<{ label: string }[]>([]);
   const groups = [
     { label: "Gruppe 1", value: "1" },
     { label: "Gruppe 2", value: "2" },
@@ -46,12 +46,14 @@ export default function AddPopup({
     fetch("/api/trainers")
       .then((response) => response.json())
       .then((data) => {
-        const trainerData = data;
-        for (const trainer of trainerData) {
-          trainerOptions.push({ label: trainer.name });
-        }
-        
-      });
+        console.log("Rohdaten der Trainer:", data);
+        const formattedTrainers = data.map((trainer: any) => ({
+        label: trainer.vorname + " " + trainer.nachname,
+      }));
+      console.log("Trainer Optionen:", formattedTrainers);
+      setTrainerOptions(formattedTrainers);
+
+    });
   }, []);
 
   return (
@@ -122,7 +124,6 @@ export default function AddPopup({
             sx={{ width: 300 }}
             renderInput={(params) => <TextField {...params} label="Trainer" />}
             onChange={(_, newValue) => {
-              // Hier ziehen wir nur die Labels heraus:
               setTrainer(newValue.map((option) => option.label));
             }}
           />
