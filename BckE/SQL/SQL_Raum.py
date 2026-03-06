@@ -1,9 +1,8 @@
-
 import sqlite3
 from datetime import date
 
 
-from Modelle.Azubi import Azubi
+from ProvadisBuchungSystem.BckE.Modelle.Raum import Raum
 
 DB = "test.db"
 

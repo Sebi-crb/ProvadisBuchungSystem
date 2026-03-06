@@ -1,17 +1,19 @@
 from faker import Faker
-import Modelle.Azubi
+
 import random
-import SQL.SQL_Azubi as SQL_Azubi
+import ProvadisBuchungSystem.BckE.SQL.SQL_Azubi as SQL_Azubi
 
 
 class Generate_Fake_Data:
+
     def __init__(self):
         self.fake = Faker()
 
 
     def generate_azubi(self, firmen):
+        import ProvadisBuchungSystem.BckE.Modelle.Azubi as Azubi
         fake = Faker('de_DE')
-        Azubi = Modelle.Azubi.Azubi()
+        Azubi =  Azubi.Azubi()
         Azubi.name = fake.last_name()
         Azubi.vorname = fake.first_name()
         Azubi.ausbildungsunternehmen = random.choice(firmen)

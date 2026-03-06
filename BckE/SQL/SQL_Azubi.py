@@ -2,9 +2,9 @@ import sqlite3
 from datetime import date
 
 
-from Modelle.Azubi import Azubi
+from ProvadisBuchungSystem.BckE.Modelle.Azubi import Azubi
 
-DB = "WIP.db"
+DB = "WIP2.db"
 
 def create_table(conn):
     conn.execute("""
@@ -49,7 +49,7 @@ def insert_Azubi(Azubi):
         )
         conn.commit()
 
-def print_all():
+def get_all():
     with sqlite3.connect(DB) as conn:
         cur = conn.execute("SELECT id, Name, Vorname, Ausbildungsunternehmen, StartDate, AttendedModules, Block FROM Azubi")
         rows = cur.fetchall()
@@ -64,9 +64,10 @@ def main():
         #azubi = GFD.generate_azubi()
         #insert_Azubi(azubi)
         print("Aktuelle Einträge in Azubi:")
-        print_all()
+        get_all()
 
 #if __name__ == "__main__":
 #    main()
-with sqlite3.connect(DB) as conn:
-    create_table(conn)
+#with sqlite3.connect(DB) as conn:
+#    create_table(conn)
+get_all()

@@ -6,6 +6,9 @@ import inspect
 class Gruppe:
     _name: str = field(default="")
     _azubiList: list = field(default="")
+    _block: str = field(default="")
+    _attendedModules: str = field(default="")
+
 
 
     countAzubis: int = 0
@@ -29,6 +32,21 @@ class Gruppe:
     def name(self, titel):
         self._titel = titel
 
+    @property
+    def block(self):
+        return self._block
+
+    @block.setter
+    def block(self, block):
+        self._block = block
+
+    @property
+    def attendedModules(self):
+        return self._attendedModules
+    @attendedModules.setter
+    def attendedModules(self, attendedModules):
+        self._attendedModules = attendedModules#.strip(' ')
+
     #@property
     #def countAzubis(self):
         #return self._countAzubis
@@ -41,7 +59,6 @@ class Gruppe:
 
     @property
     def azubiList(self):
-
         return self._azubiList
 
     @azubiList.setter

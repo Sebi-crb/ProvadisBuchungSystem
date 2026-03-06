@@ -125,7 +125,7 @@ def main():
         get_all_Trainers()
         #print_all()
 
-main()
+#main()
 #if __name__ == "__main__":
 #   main()
 #print(get_all_Trainers())
