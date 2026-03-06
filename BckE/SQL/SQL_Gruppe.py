@@ -2,7 +2,7 @@ import sqlite3
 from datetime import date
 
 
-from ProvadisBuchungSystem.BckE.Modelle.Gruppe import Gruppe
+from BckE.Modelle.Gruppe import Gruppe
 
 DB = "WIP2.db"
 

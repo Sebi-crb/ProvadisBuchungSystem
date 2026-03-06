@@ -2,7 +2,7 @@ import sqlite3
 from datetime import date
 
 
-from ProvadisBuchungSystem.BckE.Modelle.Raum import Raum
+from BckE.Modelle.Raum import Raum
 
 DB = "test.db"
 

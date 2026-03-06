@@ -1,10 +1,20 @@
 import sqlite3
 from datetime import date
+from pathlib import Path
 
+from BckE.Modelle.Azubi import Azubi
 
-from ProvadisBuchungSystem.BckE.Modelle.Azubi import Azubi
+PROJECT_ROOT_NAME = "ProvadisBuchungSystem"
+TARGET_SUBPATH = Path("BckE") / "SQL" / "WIP2.db"   # gewünschter Pfad ab Projektwurzel
 
-DB = "WIP2.db"
+here = Path(__file__).resolve()
+proj_root = next((p for p in here.parents if p.name == PROJECT_ROOT_NAME), None)
+if proj_root is None:
+    raise RuntimeError(f"Projektordner '{PROJECT_ROOT_NAME}' nicht gefunden in {here}")
+
+DB_PATH = proj_root / TARGET_SUBPATH
+DB_PATH.parent.mkdir(parents=True, exist_ok=True)   # stellt sicher, dass Ordner existiert
+DB = str(DB_PATH.resolve())
 
 def create_table(conn):
     conn.execute("""

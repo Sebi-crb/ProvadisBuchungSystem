@@ -1,7 +1,7 @@
 from faker import Faker
 import random
-import SQL.SQL_Trainer as SQL_Trainer
-import Modelle.Trainer
+import BckE.SQL.SQL_Trainer as SQL_Trainer
+import BckE.Modelle.Trainer
 
 
 class Generate_Fake_Data:
@@ -12,7 +12,7 @@ class Generate_Fake_Data:
     def generate_azubi(self):
         fake = Faker('de_DE')
 
-        Trainer = Modelle.Trainer.Trainer()
+        Trainer = BckE.Modelle.Trainer.Trainer()
         Trainer.name = fake.last_name()
         Trainer.vorname = fake.first_name()
         Trainer.ausbildungsunternehmen = fake.company()
