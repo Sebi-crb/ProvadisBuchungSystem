@@ -150,13 +150,11 @@ def main():
         company_indexing_list.append(build_company_index(item))
 
 
-    print(len(company_indexing_list))
     year_block_group = []
     for b in company_indexing_list:
         #print(set_up_groups(b))
         year_block_group.append(set_up_groups(b))
 
-    print(year_block_group[0][1])
 
 
     #dumm = build_company_index(A2025)
@@ -164,27 +162,57 @@ def main():
     #set_up_groups(dumm)
     #print(set_up_groups(dumm))
     gruppen_class = []
-    j = 0
-    for i, (block, group_azubi_list) in enumerate(year_block_group):
+    # j = 0
+    # print(year_block_group)
+    # for i, (block, group_azubi_list) in enumerate(year_block_group):
+    #
+    #     group = Gruppe.Gruppe("", [])
+    #     if (i <= 2):
+    #         group.block = "A"
+    #     elif (2 < i <= 5):
+    #         group.block = "B"
+    #     else:
+    #         group.block = "C"
+    #
+    #     if ((i + 1) % 3 == 0):
+    #         group.name = "23FA0" + str(j)
+    #     elif ((i + 1) % 3 == 1):
+    #         group.block = "25FA0" + str(j)
+    #     else:
+    #         group.block = "24FA0" + str(j)
+    #
+    #     group.azubiList = group_azubi_list
+    #     j = j + 1
 
-        print(year_block_group.index(block))
-        group = Gruppe.Gruppe("", [])
-        if (i <= 2):
-            group.block = "A"
-        elif (2 < i <= 5):
-            group.block = "B"
-        else:
-            group.block = "C"
+    finishedGroupList = []
+    for i, (block) in enumerate(year_block_group):
+        print("block ",block)
+        for j, group_azubi_list in enumerate(block):
+            print("group ", group_azubi_list)
+            group = Gruppe.Gruppe(None, [])
+            if (i <= 2):
+                group.block = "A"
+            elif (2 < i <= 5):
+                group.block = "B"
+            else:
+                group.block = "C"
 
-        if ((i + 1) % 3 == 0):
-            group.name = "23FA0" + str(j)
-        elif ((i + 1) % 3 == 1):
-            group.block = "25FA0" + str(j)
-        else:
-            group.block = "24FA0" + str(j)
+            if ((i + 1) % 3 == 0):
+                group.name = "23FA0" + str(j + 1)
+            elif ((i + 1) % 3 == 1):
+                group.name = "25FA0" + str(j + 1)
+            else:
+                group.name = "24FA0" + str(j + 1)
 
-        group.azubiList = group_azubi_list
-        j = j + 1
+
+            group.azubiList = group_azubi_list
+            group.countAzubis = len(group_azubi_list)
+            # es fehlen die fertigen module
+            # und die gruppen in den blöcken wurden nich richtig geteilt, es gibt nur 2 statt 3
+            # liegt aber vll an der länge der azubi oder so idk
+
+            finishedGroupList.append(group)
+    print(finishedGroupList)
 
 
 if __name__ == '__main__':

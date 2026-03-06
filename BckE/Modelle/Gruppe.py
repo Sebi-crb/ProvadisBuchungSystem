@@ -30,7 +30,7 @@ class Gruppe:
         return self._name
     @name.setter
     def name(self, titel):
-        self._titel = titel
+        self._name = titel
 
     @property
     def block(self):
