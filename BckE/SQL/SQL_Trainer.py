@@ -1,10 +1,25 @@
 import sqlite3
+from pathlib import Path
 from datetime import date
 import ProvadisBuchungSystem.BckE.Modelle.Trainer as Trainer
 #from ProvadisBuchungSystem.BckE.Calendar.Calendar_Trainer import remove_absence
 
-DB = "WIP2.db"
 
+
+PROJECT_ROOT_NAME = "ProvadisBuchungSystem"
+TARGET_SUBPATH = Path("BckE") / "SQL" / "WIP2.db"   # gewünschter Pfad ab Projektwurzel
+
+here = Path(__file__).resolve()
+proj_root = next((p for p in here.parents if p.name == PROJECT_ROOT_NAME), None)
+if proj_root is None:
+    raise RuntimeError(f"Projektordner '{PROJECT_ROOT_NAME}' nicht gefunden in {here}")
+
+DB_PATH = proj_root / TARGET_SUBPATH
+DB_PATH.parent.mkdir(parents=True, exist_ok=True)   # stellt sicher, dass Ordner existiert
+DB = str(DB_PATH.resolve())
+
+
+conn = sqlite3.connect(DB)
 def create_table():
     with sqlite3.connect(DB) as conn:
         conn.execute("""
@@ -35,8 +50,8 @@ def get_all_Trainers():
     with sqlite3.connect(DB) as conn:
         cur = conn.execute("SELECT id, Name, Vorname, Abwesenheiten FROM Trainer")
         rows = cur.fetchall()
-        for r in rows:
-            print(r)
+        #for r in rows:
+            #print(r)
         return rows
 
 def get_Trainer(id_):
@@ -109,25 +124,25 @@ def add_absence(id_, toAdd):
 def main():
     import ProvadisBuchungSystem.BckE.Modelle.Trainer as Trainer
     with sqlite3.connect(DB) as conn:
-        create_table()
+        #create_table()
         #insert_sample(conn)
         #azubi = GFD.generate_azubi()
         #insert_Azubi(azubi)
         Trainer = Trainer.Trainer()
-        Trainer.name = "Stark"
-        Trainer.vorname = "Tony"
-        Trainer.Abwesenheiten = "9, 10, 11"
-        #insert_Trainer(Trainer)
+        Trainer.name = "Netanyahu"
+        Trainer.vorname = "Bibi"
+        Trainer.abwesenheiten = "9, 11"
+        insert_Trainer(Trainer)
         #add_absence(1, [str(2), str(3), str(4)])
-        change_absence(1, [str(3)])
+        #change_absence(1, [str(3)])
 
         print("Aktuelle Einträge in Trainer:")
-        get_all_Trainers()
+        #get_all_Trainers()
         #print_all()
 
 #main()
 #if __name__ == "__main__":
-#   main()
+#main()
 #print(get_all_Trainers())
 
 #create_table()
