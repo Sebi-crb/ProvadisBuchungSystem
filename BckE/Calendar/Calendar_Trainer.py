@@ -56,10 +56,10 @@ def remove_absence(absenceToRemove, bookedCalendar):
 
 
 
-#print(createCal())
+print(createCal())
 
 
 bookedHolidayCalendar = (book_absence([2, 0, 4, 1]))
-print(bookedHolidayCalendar)
-restoredCalendar = remove_absence([1], bookedHolidayCalendar)
-print(restoredCalendar)
+#print(bookedHolidayCalendar)
+#restoredCalendar = remove_absence([1], bookedHolidayCalendar)
+#print(restoredCalendar)

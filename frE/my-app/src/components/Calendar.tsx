@@ -9,7 +9,7 @@ import InfoPopup from "./InfoPopup.tsx";
 import AddPopup from "./AddPopup.tsx";
 import type { EventSourceInput } from "@fullcalendar/core/index.js";
 
-export default function Calendar(props: { termine: any, gruppen: any }) {
+export default function Calendar(props: { termine: any; gruppen: any }) {
   const [showInfoPopup, setShowInfoPopup] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState(null);
 
