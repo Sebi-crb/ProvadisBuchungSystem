@@ -48,12 +48,11 @@ export default function AddPopup({
       .then((data) => {
         console.log("Rohdaten der Trainer:", data);
         const formattedTrainers = data.map((trainer: any) => ({
-        label: trainer.vorname + " " + trainer.nachname,
-      }));
-      console.log("Trainer Optionen:", formattedTrainers);
-      setTrainerOptions(formattedTrainers);
-
-    });
+          label: trainer.vorname + " " + trainer.nachname,
+        }));
+        console.log("Trainer Optionen:", formattedTrainers);
+        setTrainerOptions(formattedTrainers);
+      });
   }, []);
 
   return (
@@ -95,7 +94,7 @@ export default function AddPopup({
             onChange={(date: any) => {
               setStartDate(date);
             }}
-            className="datepicker"
+            filterDate={(date) => date.getDay() !== 0 && date.getDay() !== 6}
           />
         </div>
         <div>
@@ -103,7 +102,7 @@ export default function AddPopup({
           <DatePicker
             selected={endDate}
             onChange={(date: any) => setEndDate(date)}
-            className="datepicker"
+            filterDate={(date) => date.getDay() !== 0 && date.getDay() !== 6}
             highlightDates={[startDate]}
           />
         </div>

@@ -25,8 +25,14 @@ export default function Sidebar() {
           User
         </Button>
         <Button
-          onClick={() => navigate("/azubis")}
+          onClick={() => navigate("/home")}
           sx={{ color: "white", marginTop: 10 }}
+        >
+          Kalendar
+        </Button>
+                <Button
+          onClick={() => navigate("/azubis")}
+          sx={{ color: "white", marginTop: 5 }}
         >
           Azubi
         </Button>

@@ -26,8 +26,8 @@ COURSES = [
 ]
 
 # SCHULJAHR
-SCHOOL_YEAR_START = date(2026, 9, 1)
-SCHOOL_YEAR_END = date(2027, 8, 31)
+SCHOOL_YEAR_START = date(2025, 9, 1)
+SCHOOL_YEAR_END = date(2026, 8, 31)
 
 # FERIEN (einfach als Liste)
 HOLIDAYS = [
