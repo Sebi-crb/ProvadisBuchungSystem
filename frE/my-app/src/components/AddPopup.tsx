@@ -1,5 +1,5 @@
 import { Autocomplete, Box, Button, TextField } from "@mui/material";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import "../css/addPopup.css";
@@ -17,11 +17,15 @@ export default function AddPopup({
   const [endDate, setEndDate] = useState(startDate);
   const [modul, setModul] = useState("");
   const [trainer, setTrainer] = useState<string[]>([]);
-  const [group, setGroup] =  useState<string[]>([]);
+  const [group, setGroup] = useState<string[]>([]);
 
   const modules = [{ label: "Modul 1" }, { label: "Modul 2" }];
-  const trainers = [{ label: "Trainer 1" }, { label: "Trainer 2" }];
-  const groups = [{ label: "Gruppe 1", value: "1" }, { label: "Gruppe 2", value: "2" }, { label: "Gruppe 3", value: "3" }];
+  const trainerOptions = [];
+  const groups = [
+    { label: "Gruppe 1", value: "1" },
+    { label: "Gruppe 2", value: "2" },
+    { label: "Gruppe 3", value: "3" },
+  ];
 
   function saveEvent() {
     const newEvent = {
@@ -37,6 +41,18 @@ export default function AddPopup({
     console.log("Neuer Kurs:", newEvent);
     onClose();
   }
+
+  useEffect(() => {
+    fetch("/api/trainers")
+      .then((response) => response.json())
+      .then((data) => {
+        const trainerData = data;
+        for (const trainer of trainerData) {
+          trainerOptions.push({ label: trainer.name });
+        }
+        
+      });
+  }, []);
 
   return (
     <>
@@ -102,7 +118,7 @@ export default function AddPopup({
           <Autocomplete
             multiple
             disablePortal
-            options={trainers}
+            options={trainerOptions}
             sx={{ width: 300 }}
             renderInput={(params) => <TextField {...params} label="Trainer" />}
             onChange={(_, newValue) => {

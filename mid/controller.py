@@ -1,12 +1,14 @@
 from flask import Flask, jsonify, request
 from flask_cors import CORS
+import BckE.formatting.dataGetter as data
 
 app = Flask(__name__)
 CORS(app)
 
-@app.route('/api/test', methods=['GET'])
+@app.route('/api/trainers', methods=['GET'])
 def test():
-    return jsonify({'test': 'test'})
+    trainers = data.get_Trainers()
+    return jsonify(trainers)
 
 
 if __name__ == '__main__':

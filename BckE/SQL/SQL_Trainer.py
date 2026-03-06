@@ -1,7 +1,7 @@
 import sqlite3
 from pathlib import Path
 from datetime import date
-import ProvadisBuchungSystem.BckE.Modelle.Trainer as Trainer
+import BckE.Modelle.Trainer as Trainer
 #from ProvadisBuchungSystem.BckE.Calendar.Calendar_Trainer import remove_absence
 
 
