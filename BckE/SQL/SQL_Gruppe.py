@@ -38,8 +38,15 @@ def insert_AzubiGruppe(Gruppe):
         attendedModstr = ""
         for m in Gruppe.attendedModules:
             attendedModstr += m + ", "
+        azubiListstr = ""
+        for i, a in enumerate(Gruppe.azubiList):
+            if(i == len(Gruppe.azubiList) - 1):
+                azubiListstr += str(a)
+            else:
+                azubiListstr += str(a) + ", "
+
         samples = [
-            (Gruppe.name, Gruppe.Block, Gruppe.Azubis, Gruppe.AttendedModules),
+            (Gruppe.name, Gruppe.block, azubiListstr, attendedModstr),
         ]
         conn.executemany(
             "INSERT INTO Gruppe (Name, Block, Azubis, AttendedModules) VALUES (?, ?, ?, ?)",
@@ -47,13 +54,18 @@ def insert_AzubiGruppe(Gruppe):
         )
         conn.commit()
 
-def print_all():
+def get_all():
     with sqlite3.connect(DB) as conn:
-        cur = conn.execute("SELECT id, Name, Name, Block, Azubis, AttendedModules FROM Gruppe")
+        cur = conn.execute("SELECT id, Name, Block, Azubis, AttendedModules FROM Gruppe")
         rows = cur.fetchall()
         for r in rows:
             print(r)
         return rows
+
+def drop_table():
+    with sqlite3.connect(DB) as conn:
+        conn.execute("DROP TABLE IF EXISTS Gruppe")
+        conn.commit()
 
 def main():
     with sqlite3.connect(DB) as conn:
@@ -61,10 +73,13 @@ def main():
         #insert_sample(conn)
         #azubi = GFD.generate_azubi()
         #insert_Azubi(azubi)
+        drop_table()
         print("Aktuelle Einträge in Gruppe:")
-        print_all()
+        get_all()
 
 #if __name__ == "__main__":
 #    main()
+
+#drop_table()
 with sqlite3.connect(DB) as conn:
     create_table(conn)

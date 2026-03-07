@@ -186,9 +186,9 @@ def main():
 
     finishedGroupList = []
     for i, (block) in enumerate(year_block_group):
-        print("block ",block)
+        #print("block ",block)
         for j, group_azubi_list in enumerate(block):
-            print("group ", group_azubi_list)
+            #print("group ", group_azubi_list)
             group = Gruppe.Gruppe(None, [])
             if (i <= 2):
                 group.block = "A"
@@ -212,7 +212,10 @@ def main():
             # liegt aber vll an der länge der azubi oder so idk
 
             finishedGroupList.append(group)
-    print(finishedGroupList)
+    #print(finishedGroupList)
+    for group in finishedGroupList:
+        Gruppe_SQL.insert_AzubiGruppe(group)
+    Gruppe_SQL.get_all()
 
 
 if __name__ == '__main__':
