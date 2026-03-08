@@ -36,8 +36,11 @@ def insert_sample(conn):
 def insert_AzubiGruppe(Gruppe):
     with sqlite3.connect(DB) as conn:
         attendedModstr = ""
-        for m in Gruppe.attendedModules:
-            attendedModstr += m + ", "
+        for i, m in enumerate(Gruppe.attendedModules):
+            if (i == len(Gruppe.attendedModules) - 1):
+                attendedModstr += m
+            else:
+                attendedModstr += m + ", "
         azubiListstr = ""
         for i, a in enumerate(Gruppe.azubiList):
             if(i == len(Gruppe.azubiList) - 1):
