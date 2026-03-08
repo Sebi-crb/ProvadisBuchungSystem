@@ -2,6 +2,7 @@ from datetime import datetime
 
 import BckE.SQL.SQL_Trainer as Sql_Trainer
 import BckE.SQL.SQL_Azubi as Sql_Azubi
+import BckE.SQL.SQL_Gruppe as Sql_Gruppe
 
 def get_Trainers():
     data = Sql_Trainer.get_all_Trainers()
@@ -52,11 +53,24 @@ def get_Azubis():
             "ausbildungsJahr": calculateYear(set[4]),
             "block": set[6],
         }
-        array = [x.strip() for x in set[3].split(",")]
+        array = [x.strip() for x in set[5].split(",")]
         formated_dataObj.update({"attendedModules": array})
         formated_dataArray.append(formated_dataObj)
     return formated_dataArray
 
+def get_Gruppen():
+    data = Sql_Gruppe.get_all()
+    formaed_dataArray = []
+    for set in data:
+        formated_dataObj = {
+            "id": set[0],
+            "namen": set[1],
+            "block" : set[2],
+        }
+        azubiArray = [x.strip() for x in set[3].split(",")]
+        formated_dataObj.update({"azubis": azubiArray})
+        attendModulesArray = [x.strip() for x in set[4].split(",")]
+        formated_dataObj.update({"attendedModules": attendModulesArray})
+        formaed_dataArray.append(formated_dataObj)
+    return formaed_dataArray
 
-print(get_Trainers())
-print (get_Azubis())

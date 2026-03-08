@@ -16,6 +16,24 @@ def get_azubis():
     azubis = dataGetter.get_Azubis()
     return jsonify(azubis)
 
+@app.route('/api/gruppen', methods=['GET'])
+def get_gruppen():
+    gruppen = dataGetter.get_Gruppen()
+    return jsonify(gruppen)
+
+@app.route('/api/gruppenAndAzubis', methods=['GET'])
+def get_gruppenMitAzubis():
+    gruppen = dataGetter.get_Gruppen()
+    azubiObjectList = dataGetter.get_Azubis()
+    azubiIdMap = {s['id']: s for s in azubiObjectList}
+
+    for gruppe in gruppen:
+        idAzubiList = gruppe.get('azubis')
+        azubis = [azubiIdMap.get(int(id)) for id in idAzubiList]
+        gruppe['azubis'] = azubis
+
+    return jsonify(gruppen)
+
 @app.route('/api/setHolidays', methods=['POST'])
 def set_holidays():
     data = request.json

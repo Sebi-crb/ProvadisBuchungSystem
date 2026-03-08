@@ -11,22 +11,13 @@ import { useNavigate } from "react-router-dom";
 import data from "../../responses/azubiPageSrc.json";
 import AzubiSearchField from "./AzubiSearchField";
 
-type Azubi = {
-  id: number;
-  name: string;
-  unternehmen: string;
-  abgeschlosseneModule: string[];
-  ausbildungsjahr: string;
-};
-
-const gruppen = data.Gruppen as Record<string, { azubis: Azubi[] }>;
 
 export default function AzubisPage() {
   useEffect(() => {
-    fetch("/api/azubis")
+    fetch("/api/gruppenAndAzubis")
       .then((response) => response.json())
       .then((data) => {
-        // Handle the fetched data
+        const gruppen = data;
       });
   }, []);
 
