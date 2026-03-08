@@ -3,7 +3,7 @@
     {
       "title": "Softwareentwicklung",
       "trainer": ["Bell", "Christoph"],
-      "gruppe": ["1"],
+      "gruppe": [{"name": "Gruppe 1", "id": "1"}, {"name": "Gruppe 2", "id": "2"}],
       "start": "2026-03-09",
       "end": "2026-03-11",
       "raum": "Raum 1"
@@ -11,7 +11,7 @@
     {
       "title": "Netzwerktechnik Basics",
       "trainer": ["Schmidt", "Meyer"],
-      "gruppe": ["2", "3"],
+      "gruppe": [{"name": "Gruppe 1", "id": "1"}],
       "start": "2026-03-12",
       "end": "2026-03-13",
       "raum": "Labor 04"
@@ -19,7 +19,7 @@
     {
       "title": "Projektmanagement & Agile",
       "trainer": ["Dr. Wagner"],
-      "gruppe": ["3", "1"],
+      "gruppe": [{"name": "Gruppe 3", "id": "3"}, {"name": "Gruppe 1", "id": "1"}],
       "start": "2026-03-16",
       "end": "2026-03-18",
       "raum": "Konferenzraum Blau"
@@ -27,7 +27,7 @@
     {
       "title": "Cyber Security Awareness",
       "trainer": ["Hackl", "Sicher"],
-      "gruppe": ["1"],
+      "gruppe": [{"name": "Gruppe 1", "id": "1"}],
       "start": "2026-03-20",
       "end": "2026-03-20",
       "raum": "Aula"
@@ -35,7 +35,7 @@
     {
       "title": "Cloud Infrastruktur (AWS/Azure)",
       "trainer": ["Nakamoto", "Finney"],
-      "gruppe": ["3"],
+      "gruppe": [{"name": "Gruppe 3", "id": "3"}],
       "start": "2026-03-23",
       "end": "2026-03-25",
       "raum": "Virtual Lab 1"
@@ -43,7 +43,7 @@
     {
       "title": "Hardware & PC-Assemblierung",
       "trainer": ["Tech", "Toni"],
-      "gruppe": ["2"],
+      "gruppe": [{"name": "Gruppe 2", "id": "2"}],
       "start": "2026-03-26",
       "end": "2026-03-26",
       "raum": "Werkstatt Süd"
@@ -51,7 +51,7 @@
     {
       "title": "Kommunikation & Teamdynamik",
       "trainer": ["Herzberg", "Maslow"],
-      "gruppe": ["3"],
+      "gruppe": [{"name": "Gruppe 3", "id": "3"}],
       "start": "2026-03-30",
       "end": "2026-03-31",
       "raum": "Raum 5 (Lounge)"
