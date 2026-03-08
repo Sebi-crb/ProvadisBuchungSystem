@@ -21,11 +21,7 @@ export default function AddPopup({
 
   const modules = [{ label: "Modul 1" }, { label: "Modul 2" }];
   const [trainerOptions, setTrainerOptions] = useState<{ label: string }[]>([]);
-  const groups = [
-    { label: "Gruppe 1", value: "1" },
-    { label: "Gruppe 2", value: "2" },
-    { label: "Gruppe 3", value: "3" },
-  ];
+  const [groupOptions, setGroupOptions] = useState<{ label: string; value: number }[]>([]);
 
   function saveEvent() {
     const newEvent = {
@@ -53,6 +49,18 @@ export default function AddPopup({
         console.log("Trainer Optionen:", formattedTrainers);
         setTrainerOptions(formattedTrainers);
       });
+
+      fetch("/api/gruppen")
+        .then((response) => response.json())
+        .then((data) => {
+          console.log("Rohdaten der Gruppen:", data);
+          const formattedGroups = data.map((group: any) => ({
+            label: group.namen,
+            value: group.id,
+          }));
+          console.log("Gruppen Optionen:", formattedGroups);
+          setGroupOptions(formattedGroups);
+        });
   }, []);
 
   return (
@@ -131,7 +139,7 @@ export default function AddPopup({
           <Autocomplete
             multiple
             disablePortal
-            options={groups}
+            options={groupOptions}
             sx={{ width: 300 }}
             renderInput={(params) => <TextField {...params} label="Group" />}
             onChange={(_, newValue) => {

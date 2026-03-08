@@ -8,38 +8,58 @@ import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import data from "../../responses/azubiPageSrc.json";
 import AzubiSearchField from "./AzubiSearchField";
 
+type Azubi = {
+  id: number;
+  vorname: string;
+  nachname: string;
+  unternehmen: string;
+  attendedModules: string[];
+  ausbildungsJahr: number;
+  block: string;
+};
+
+type Gruppe = {
+  id: number;
+  namen: string;
+  block: string;
+  attendedModules: string[];
+  azubis: Azubi[];
+};
 
 export default function AzubisPage() {
-  useEffect(() => {
-    fetch("/api/gruppenAndAzubis")
-      .then((response) => response.json())
-      .then((data) => {
-        const gruppen = data;
-      });
-  }, []);
-
+  const [gruppen, setGruppen] = useState<Gruppe[]>([]);
   const [search, setSearch] = useState("");
   const navigate = useNavigate();
 
-  const gruppenIds = useMemo(() => Object.keys(gruppen), []);
+  useEffect(() => {
+    fetch("/api/gruppenAndAzubis")
+      .then((response) => response.json())
+      .then((data: Gruppe[]) => {
+        setGruppen(data);
+      });
+  }, []);
 
   const filteredGruppen = useMemo(() => {
     const term = search.trim().toLowerCase();
     if (!term) {
-      return gruppenIds;
+      return gruppen;
     }
-    return gruppenIds.filter((gid) => {
-      if (gid.toLowerCase().includes(term)) {
+    return gruppen.filter((gruppe) => {
+      if (gruppe.namen.toLowerCase().includes(term)) {
         return true;
       }
-      return gruppen[gid].azubis.some((a) =>
-        a.name.toLowerCase().includes(term),
+      if (gruppe.block.toLowerCase().includes(term)) {
+        return true;
+      }
+      return gruppe.azubis.some(
+        (a) =>
+          a.vorname.toLowerCase().includes(term) ||
+          a.nachname.toLowerCase().includes(term),
       );
     });
-  }, [search, gruppenIds]);
+  }, [search, gruppen]);
 
   return (
     <Box
@@ -93,25 +113,27 @@ export default function AzubisPage() {
               gap: 2,
             }}
           >
-            {filteredGruppen.map((gid) => {
-              const azubis = gruppen[gid].azubis;
+            {filteredGruppen.map((gruppe) => {
               const years = Array.from(
-                new Set(azubis.map((a) => a.ausbildungsjahr)),
+                new Set(gruppe.azubis.map((a) => a.ausbildungsJahr)),
               ).sort();
               return (
                 <Paper
-                  key={gid}
+                  key={gruppe.id}
                   sx={{
                     p: 2,
                     borderRadius: 2,
                     cursor: "pointer",
                     "&:hover": { boxShadow: 4 },
                   }}
-                  onClick={() => navigate(`/azubis/group/${gid}`)}
+                  onClick={() => navigate(`/azubis/group/${gruppe.id}`)}
                 >
-                  <Typography variant="h6">Gruppe {gid}</Typography>
+                  <Typography variant="h6">{gruppe.namen}</Typography>
                   <Typography sx={{ mt: 0.5, color: "text.secondary" }}>
-                    {azubis.length} Azubis
+                    Block {gruppe.block}
+                  </Typography>
+                  <Typography sx={{ mt: 0.5, color: "text.secondary" }}>
+                    {gruppe.azubis.length} Azubis
                   </Typography>
                   <Typography sx={{ mt: 0.5, color: "text.secondary" }}>
                     Ausbildungsjahre: {years.join(", ")}

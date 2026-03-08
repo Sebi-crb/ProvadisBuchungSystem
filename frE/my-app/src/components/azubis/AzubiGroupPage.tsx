@@ -13,41 +13,57 @@ import ListItemText from "@mui/material/ListItemText";
 import Paper from "@mui/material/Paper";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import data from "../../responses/azubiPageSrc.json";
 import AzubiSearchField from "./AzubiSearchField";
 
 type Azubi = {
   id: number;
-  name: string;
+  vorname: string;
+  nachname: string;
   unternehmen: string;
-  abgeschlosseneModule: string[];
-  ausbildungsjahr: string;
+  attendedModules: string[];
+  ausbildungsJahr: number;
+  block: string;
 };
 
-const gruppen = data.Gruppen as Record<string, { azubis: Azubi[] }>;
-const moduleData = data.Module as Record<string, { title: string }>;
+type Gruppe = {
+  id: number;
+  namen: string;
+  block: string;
+  attendedModules: string[];
+  azubis: Azubi[];
+};
 
 export default function AzubiGroupPage() {
   const { groupId } = useParams();
   const navigate = useNavigate();
+  const [gruppe, setGruppe] = useState<Gruppe | null>(null);
+  const [notFound, setNotFound] = useState(false);
   const [modalAzubi, setModalAzubi] = useState<Azubi | null>(null);
   const [search, setSearch] = useState("");
 
-  const gid = groupId ?? "";
-  const gruppe = gruppen[gid];
+  useEffect(() => {
+    fetch("/api/gruppenAndAzubis")
+      .then((response) => response.json())
+      .then((data: Gruppe[]) => {
+        const found = data.find((g) => String(g.id) === groupId);
+        if (found) {
+          setGruppe(found);
+        } else {
+          setNotFound(true);
+        }
+      });
+  }, [groupId]);
 
   const filteredAzubis = useMemo(() => {
-    if (!gruppe) {
-      return [];
-    }
+    if (!gruppe) return [];
     const term = search.trim().toLowerCase();
-    if (!term) {
-      return gruppe.azubis;
-    }
-    return gruppe.azubis.filter((a) =>
-      a.name.toLowerCase().includes(term)
+    if (!term) return gruppe.azubis;
+    return gruppe.azubis.filter(
+      (a) =>
+        a.vorname.toLowerCase().includes(term) ||
+        a.nachname.toLowerCase().includes(term),
     );
   }, [gruppe, search]);
 
@@ -56,7 +72,7 @@ export default function AzubiGroupPage() {
     setModalAzubi(null);
   }
 
-  if (!gruppe) {
+  if (notFound || (!gruppe && groupId)) {
     return (
       <Box
         sx={{
@@ -78,7 +94,7 @@ export default function AzubiGroupPage() {
           </Toolbar>
         </AppBar>
         <Box sx={{ p: 3 }}>
-          <Typography>Gruppe nicht gefunden.</Typography>
+          <Typography>{notFound ? "Gruppe nicht gefunden." : "Lade..."}</Typography>
         </Box>
       </Box>
     );
@@ -99,7 +115,7 @@ export default function AzubiGroupPage() {
             <ArrowBackIcon />
           </IconButton>
           <Typography variant="h6" sx={{ ml: 1 }}>
-            Gruppe {gid}
+            {gruppe ? `${gruppe.namen} (Block ${gruppe.block})` : "Lade..."}
           </Typography>
         </Toolbar>
       </AppBar>
@@ -117,8 +133,8 @@ export default function AzubiGroupPage() {
               {filteredAzubis.map((a) => (
                 <ListItemButton key={a.id} onClick={() => setModalAzubi(a)}>
                   <ListItemText
-                    primary={a.name}
-                    secondary={`${a.unternehmen} • Ausbildungsjahr ${a.ausbildungsjahr}`}
+                    primary={`${a.vorname} ${a.nachname}`}
+                    secondary={`${a.unternehmen} • Ausbildungsjahr ${a.ausbildungsJahr}`}
                   />
                 </ListItemButton>
               ))}
@@ -130,13 +146,16 @@ export default function AzubiGroupPage() {
       <Dialog open={!!modalAzubi} onClose={() => setModalAzubi(null)} fullWidth maxWidth="sm">
         {modalAzubi && (
           <>
-            <DialogTitle>{modalAzubi.name}</DialogTitle>
+            <DialogTitle>{`${modalAzubi.vorname} ${modalAzubi.nachname}`}</DialogTitle>
             <DialogContent>
               <Typography sx={{ mt: 0.5 }}>
                 <strong>Unternehmen:</strong> {modalAzubi.unternehmen}
               </Typography>
               <Typography sx={{ mt: 0.5 }}>
-                <strong>Ausbildungsjahr:</strong> {modalAzubi.ausbildungsjahr}
+                <strong>Ausbildungsjahr:</strong> {modalAzubi.ausbildungsJahr}
+              </Typography>
+              <Typography sx={{ mt: 0.5 }}>
+                <strong>Block:</strong> {modalAzubi.block}
               </Typography>
 
               <Typography sx={{ mt: 2, mb: 1 }}>
@@ -144,14 +163,16 @@ export default function AzubiGroupPage() {
               </Typography>
 
               <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
-                {modalAzubi.abgeschlosseneModule.map((mid) => (
-                  <Chip
-                    key={mid}
-                    label={moduleData[mid]?.title || `Modul ${mid}`}
-                    onClick={() => openModul(mid)}
-                    sx={{ bgcolor: "#026291", color: "white" }}
-                  />
-                ))}
+                {modalAzubi.attendedModules
+                  .filter((mid) => mid !== "")
+                  .map((mid) => (
+                    <Chip
+                      key={mid}
+                      label={`Modul ${mid}`}
+                      onClick={() => openModul(mid)}
+                      sx={{ bgcolor: "#026291", color: "white" }}
+                    />
+                  ))}
               </Box>
             </DialogContent>
           </>
@@ -160,4 +181,3 @@ export default function AzubiGroupPage() {
     </Box>
   );
 }
-

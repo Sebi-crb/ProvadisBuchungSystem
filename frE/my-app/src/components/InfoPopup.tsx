@@ -1,7 +1,6 @@
 import { Box } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 
-
 export default function Popup({
   onClose,
   event,
@@ -83,7 +82,13 @@ export default function Popup({
             Gruppe:
           </h4>
           <div>
-            <p>{event?.extendedProps?.group?.join(", ")}</p>{" "}
+            {event?.extendedProps?.group?.map((g: { name: string, id: string }) => (
+              <p key={g.id}>
+                <a href={`/azubis/group/${g.id}`}>
+                  {g.name}
+                </a>
+              </p>
+            ))}
           </div>
         </div>
         <div>Raum: {event?.extendedProps?.raum}</div>
