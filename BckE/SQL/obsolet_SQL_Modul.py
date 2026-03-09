@@ -16,7 +16,7 @@ def create_table(conn):
         Lehrjahr INTEGER NOT NULL,
         OptionaleVorgängerModule TEXT NOT NULL,
         VerpflichtendeVorgängerModule TEXT NOT NULL,
-        _PcKennzeichnung Text NOT NULL,  
+        PcKennzeichnung Text NOT NULL
     );
     """)
     conn.commit()
@@ -53,6 +53,12 @@ def get_all():
         rows = cur.fetchall()
         #for r in rows:
             #print(r)
+        return rows
+
+def select_for_setup():
+    with sqlite3.connect(DB) as conn:
+        cur = conn.execute("SELECT id, Dauer FROM Modul")
+        rows = cur.fetchall()
         return rows
 
 def drop_table():

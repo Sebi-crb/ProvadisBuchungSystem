@@ -2,7 +2,7 @@ from datetime import timedelta
 
 from ortools.sat.python import cp_model
 
-import config
+import BckE.Calendar.config as config
 
 
 def get_available_days():
@@ -72,7 +72,7 @@ def createAzubiCal(block):
     return newAvailableDays
 
 
-print(createAzubiCal("A"))
+#print(createAzubiCal("A"))
 
 
 

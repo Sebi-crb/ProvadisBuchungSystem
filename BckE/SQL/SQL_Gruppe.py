@@ -31,17 +31,6 @@ def create_table(conn):
 def delete(id_):
     with sqlite3.connect(DB) as c: c.execute("DELETE FROM Gruppe WHERE id=?", (id_,))
 
-def insert_sample(conn):
-    samples = [
-        ("Müller", "Anna", "Firma A", "2024", "Modul1;Modul2", "A"),
-        ("Schmidt", "Ben", "Firma B", "2025", "Modul1", "B"),
-        ("Meier", "Clara", "Firma C", "2024", "Modul2;Modul3", "A"),
-    ]
-    conn.executemany(
-        "INSERT INTO Gruppe (Name, Block, Azubis, AttendedModules) VALUES (?, ?, ?)",
-        samples
-    )
-    conn.commit()
 
 def insert_AzubiGruppe(Gruppe):
     with sqlite3.connect(DB) as conn:
@@ -71,8 +60,8 @@ def get_all():
     with sqlite3.connect(DB) as conn:
         cur = conn.execute("SELECT id, Name, Block, Azubis, AttendedModules FROM Gruppe")
         rows = cur.fetchall()
-        for r in rows:
-            print(r)
+        #for r in rows:
+            #print(r)
         return rows
 
 def drop_table():
