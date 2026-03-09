@@ -1,8 +1,11 @@
+from asyncio import print_call_graph
 from datetime import datetime
 
 import BckE.SQL.SQL_Trainer as Sql_Trainer
 import BckE.SQL.SQL_Azubi as Sql_Azubi
 import BckE.SQL.SQL_Gruppe as Sql_Gruppe
+import BckE.SQL.config_Module
+
 
 def get_Trainers():
     data = Sql_Trainer.get_all_Trainers()
@@ -73,4 +76,8 @@ def get_Gruppen():
         formated_dataObj.update({"attendedModules": attendModulesArray})
         formaed_dataArray.append(formated_dataObj)
     return formaed_dataArray
+
+def get_Modules():
+    data = BckE.SQL.config_Module.get_Modules()
+    return data
 

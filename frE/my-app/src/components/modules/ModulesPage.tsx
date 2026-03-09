@@ -22,6 +22,8 @@ type Modul = {
   vorgaengerModule: string[];
 };
 
+
+
 const moduleData = data.Module as Record<string, Modul>;
 const modulIds = Object.keys(moduleData);
 
@@ -37,6 +39,18 @@ export default function ModulesPage() {
       refs.current[modulParam]?.scrollIntoView({ behavior: "smooth", block: "center" });
     }
   }, [modulParam]);
+
+
+  useEffect(() => {
+  fetch("/api/modules")
+    .then((res) => res.json())
+    .then((data) => {
+      console.log("Fetched modules:", data);
+    })
+    .catch((err) => {
+      console.error("Error fetching modules:", err);
+    });
+},[]);
 
   return (
     <Box
