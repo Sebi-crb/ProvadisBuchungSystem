@@ -1,7 +1,7 @@
 from datetime import date
 
-modules = {}
-modules : dict
+Räume = {}
+Räume : dict
 
 
 
@@ -113,7 +113,7 @@ Räume = {
 
 }
 
-def get_Modules():
+def get_Räume():
     return Räume
 
 #print(get_Modules())

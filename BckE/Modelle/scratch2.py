@@ -1,21 +1,33 @@
 import random
-from datetime import date
+import BckE.SQL.config_Raum as Räume
 
-def random_start_date(min_year=2023, max_year=2026):
-    y = random.randint(min_year, max_year)
-    return date(y, 9, 1)
 
-def lehrjahr(start_date: date, ref: date | None = None, max_year: int | None = 3) -> int:
-    if ref is None:
-        ref = date.today()
-    # Lehrjahr zählt akademisch ab 01.09.: +1, wenn Referenzmonat >= September
-    y = ref.year - start_date.year + (1 if ref.month >= 9 else 0)
-    if y < 1:
-        y = 1
-    if max_year is not None and y > max_year:
-        y = max_year
-    return y
 
-# Beispiel
-sd = random_start_date(2023, 2025)
-print(sd.isoformat(), "-> Lehrjahr", lehrjahr(sd))
+räume = Räume.get_Räume()
+"INSERT INTO Räume (Name, Plätze, IstPcRaum, Abwesenheiten) VALUES (?, ?, ?, ?)",
+# Einen Raum über ID abrufen
+räume[1]                    # → {'id': 1, 'name': 'Raum 1', ...}
+
+# Einzelne Werte
+räume[1]['name']            # → 'Raum 1'
+räume[1]['Plätze']          # → '18'
+räume[1]['pcKennzeichnung'] # → True
+
+# Alle Räume durchlaufen
+for id, raum in räume.items():
+    print(raum['name'],raum['Plätze'], raum['pcKennzeichnung'])
+
+
+# Nur Räume mit PC
+mit_pc = {id: r for id, r in räume.items() if r['pcKennzeichnung']}
+
+# Nur Räume ohne PC
+ohne_pc = {id: r for id, r in räume.items() if not r['pcKennzeichnung']}
+
+# Raum mit bestimmter Mindestanzahl Plätze
+große_räume = {id: r for id, r in räume.items() if int(r['Plätze']) >= 24}
+
+
+
+
+

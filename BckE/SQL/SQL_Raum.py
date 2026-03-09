@@ -1,6 +1,6 @@
 import sqlite3
 from datetime import date
-
+import config_Raum as import_Räume
 from pathlib import Path
 from BckE.Modelle.Raum import Raum
 
@@ -16,50 +16,53 @@ DB_PATH = proj_root / TARGET_SUBPATH
 DB_PATH.parent.mkdir(parents=True, exist_ok=True)   # stellt sicher, dass Ordner existiert
 DB = str(DB_PATH.resolve())
 
-def create_table(conn):
-    conn.execute("""
-    CREATE TABLE IF NOT EXISTS Raum (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        Name TEXT NOT NULL,
-        Plätze TEXT NOT NULL,
-        PCRaum TEXT NOT NULL,
-        Abwesenheiten TEXT NOT NULL
-    );
-    """)
-    conn.commit()
-
-def delete(id_):
-    with sqlite3.connect(DB) as c: c.execute("DELETE FROM Räume WHERE id=?", (id_,))
-
-def insert_Trainer(Trainer):
+def create_table():
     with sqlite3.connect(DB) as conn:
-        samples = [
-            (Trainer.name, Trainer.vorname, Trainer.abwesenheiten),
-        ]
-        conn.executemany(
-            "INSERT INTO Trainer (Name, Vorname, Abwesenheiten) VALUES (?, ?, ?)",
-            samples
-        )
+        conn.execute("""
+        CREATE TABLE IF NOT EXISTS Raum (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            Name TEXT NOT NULL,
+            Plätze TEXT NOT NULL,
+            IstPcRaum TEXT NOT NULL,
+            Abwesenheiten TEXT NOT NULL
+        );
+        """)
         conn.commit()
 
-def get_all_Trainers():
+def delete(id_):
+    with sqlite3.connect(DB) as c: c.execute("DELETE FROM Raum WHERE id=?", (id_,))
+
+def insert_Räume():
     with sqlite3.connect(DB) as conn:
-        cur = conn.execute("SELECT id, Name, Vorname, Abwesenheiten FROM Trainer")
+        Räume = import_Räume.get_Räume()
+        for id, raum in Räume.items():
+            samples = [
+                (raum['name'], raum['Plätze'], raum['pcKennzeichnung'], ""),
+            ]
+            conn.executemany(
+                "INSERT INTO Raum (Name, Plätze, IstPcRaum, Abwesenheiten) VALUES (?, ?, ?, ?)",
+                samples
+            )
+            conn.commit()
+
+def get_all_Rooms():
+    with sqlite3.connect(DB) as conn:
+        cur = conn.execute("SELECT * FROM Raum")
         rows = cur.fetchall()
-        #for r in rows:
-            #print(r)
+        for r in rows:
+            print(r)
         return rows
 
-def get_Trainer(id_):
+def get_Room(id_):
     with sqlite3.connect(DB) as conn:
-        cur = conn.execute("SELECT * FROM Trainer WHERE id=?", (id_,))
+        cur = conn.execute("SELECT * FROM Raum WHERE id=?", (id_,))
         row = cur.fetchone()
         return row
 
 
 def change_absence(id_, toRemove):
     with sqlite3.connect(DB) as conn:
-        cur = conn.execute("SELECT Abwesenheiten FROM Trainer WHERE id = ?", (id_,))
+        cur = conn.execute("SELECT Abwesenheiten FROM Raum WHERE id = ?", (id_,))
         row = cur.fetchone()
         if not row:
             return
@@ -77,7 +80,7 @@ def change_absence(id_, toRemove):
 
         # Update in DB schreiben
         conn.execute(
-            "UPDATE Trainer SET Abwesenheiten = ? WHERE id = ?",
+            "UPDATE Raum SET Abwesenheiten = ? WHERE id = ?",
             (neuer_text, id_)
         )
 
@@ -86,7 +89,7 @@ def change_absence(id_, toRemove):
 
 def add_absence(id_, toAdd):
     with sqlite3.connect(DB) as conn:
-        cur = conn.execute("SELECT Abwesenheiten FROM Trainer WHERE id = ?", (id_,))
+        cur = conn.execute("SELECT Abwesenheiten FROM Raum WHERE id = ?", (id_,))
         row = cur.fetchone()
         if not row:
             return
@@ -109,7 +112,7 @@ def add_absence(id_, toAdd):
 
         # Update in DB schreiben
         conn.execute(
-            "UPDATE Trainer SET Abwesenheiten = ? WHERE id = ?",
+            "UPDATE Raum SET Abwesenheiten = ? WHERE id = ?",
             (neuer_text, id_)
         )
 
@@ -124,20 +127,17 @@ def main():
         #insert_sample(conn)
         #azubi = GFD.generate_azubi()
         #insert_Azubi(azubi)
-        Trainer = Trainer.Trainer()
-        Trainer.name = "Netanyahu"
-        Trainer.vorname = "Bibi"
-        Trainer.abwesenheiten = "9, 11"
-        insert_Trainer(Trainer)
+        #insert_Räume()
+        get_all_Rooms()
         #add_absence(1, [str(2), str(3), str(4)])
         #change_absence(1, [str(3)])
 
-        print("Aktuelle Einträge in Trainer:")
+        #print("Aktuelle Einträge in Trainer:")
         #get_all_Trainers()
         #print_all()
 
 #main()
 #if __name__ == "__main__":
-#main()
-#print(get_all_Trainers())
+main()
+create_table()
 
