@@ -1,69 +1,143 @@
 import sqlite3
 from datetime import date
 
-
+from pathlib import Path
 from BckE.Modelle.Raum import Raum
 
-DB = "test.db"
+PROJECT_ROOT_NAME = "ProvadisBuchungSystem"
+TARGET_SUBPATH = Path("BckE") / "SQL" / "WIP2.db"   # gewünschter Pfad ab Projektwurzel
+
+here = Path(__file__).resolve()
+proj_root = next((p for p in here.parents if p.name == PROJECT_ROOT_NAME), None)
+if proj_root is None:
+    raise RuntimeError(f"Projektordner '{PROJECT_ROOT_NAME}' nicht gefunden in {here}")
+
+DB_PATH = proj_root / TARGET_SUBPATH
+DB_PATH.parent.mkdir(parents=True, exist_ok=True)   # stellt sicher, dass Ordner existiert
+DB = str(DB_PATH.resolve())
 
 def create_table(conn):
     conn.execute("""
     CREATE TABLE IF NOT EXISTS Raum (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         Name TEXT NOT NULL,
+        Plätze TEXT NOT NULL,
         PCRaum TEXT NOT NULL,
-        BlockiertIn TEXT NOT NULL
+        Abwesenheiten TEXT NOT NULL
     );
     """)
     conn.commit()
 
 def delete(id_):
-    with sqlite3.connect(DB) as c: c.execute("DELETE FROM Raum WHERE id=?", (id_,))
+    with sqlite3.connect(DB) as c: c.execute("DELETE FROM Räume WHERE id=?", (id_,))
 
-def insert_sample(conn):
-    samples = [
-        ("1.12", "True", ["6", "16", "45", "46", "47"]),
-        ("1.11", "False", ["3", "5", "23", "12", "43"]),
-        ("1.10", "True", ["1", "2", "4", "43", "52"]),
-    ]
-    conn.executemany(
-        "INSERT INTO Raum (Name, PCRaum, BlockiertIn) VALUES (?, ?, ?, )",
-        samples
-    )
-    conn.commit()
-
-def insert_Raum(Raum):
+def insert_Trainer(Trainer):
     with sqlite3.connect(DB) as conn:
-        blocked = ""
-        for b in Raum.isBlocked:
-            blocked += b + ", "
         samples = [
-            (Raum.name, Raum.isPC, blocked)
+            (Trainer.name, Trainer.vorname, Trainer.abwesenheiten),
         ]
         conn.executemany(
-            "INSERT INTO Raum (Name, PCRaum, BlockiertIn) VALUES (?, ?, ?, )",
+            "INSERT INTO Trainer (Name, Vorname, Abwesenheiten) VALUES (?, ?, ?)",
             samples
         )
         conn.commit()
 
-def print_all():
+def get_all_Trainers():
     with sqlite3.connect(DB) as conn:
-        cur = conn.execute("SELECT Name, PCRaum, BlockiertIn FROM Raum")
+        cur = conn.execute("SELECT id, Name, Vorname, Abwesenheiten FROM Trainer")
         rows = cur.fetchall()
-        for r in rows:
-            print(r)
+        #for r in rows:
+            #print(r)
         return rows
 
-def main():
+def get_Trainer(id_):
     with sqlite3.connect(DB) as conn:
-        create_table(conn)
+        cur = conn.execute("SELECT * FROM Trainer WHERE id=?", (id_,))
+        row = cur.fetchone()
+        return row
+
+
+def change_absence(id_, toRemove):
+    with sqlite3.connect(DB) as conn:
+        cur = conn.execute("SELECT Abwesenheiten FROM Trainer WHERE id = ?", (id_,))
+        row = cur.fetchone()
+        if not row:
+            return
+
+        # Text in Liste umwandeln
+        werte = row[0]  # z.B. "1, 2, 3, 4, 5"
+        liste = [x.strip() for x in werte.split(",")]
+
+        # Werte entfernen (als Strings vergleichen)
+        werte_entfernen = set(str(w) for w in toRemove)
+        neue_liste = [x for x in liste if x not in werte_entfernen]
+
+        # Neue Zeichenkette erzeugen
+        neuer_text = ", ".join(neue_liste)
+
+        # Update in DB schreiben
+        conn.execute(
+            "UPDATE Trainer SET Abwesenheiten = ? WHERE id = ?",
+            (neuer_text, id_)
+        )
+
+        return neuer_text
+
+
+def add_absence(id_, toAdd):
+    with sqlite3.connect(DB) as conn:
+        cur = conn.execute("SELECT Abwesenheiten FROM Trainer WHERE id = ?", (id_,))
+        row = cur.fetchone()
+        if not row:
+            return
+
+        # Aktuelle Werte in Liste umwandeln
+        werte = row[0]  # z.B. "1, 3, 5"
+        liste = [x.strip() for x in werte.split(",") if x.strip()]
+
+        # Neue Werte hinzufügen (als Strings)
+        for w in toAdd:
+            w_str = str(w)
+            if w_str not in liste:
+                liste.append(w_str)
+
+        # Sortieren optional (falls du die Reihenfolge sauber halten willst)
+        liste = sorted(liste, key=lambda x: int(x))
+
+        # Neue Zeichenkette erzeugen
+        neuer_text = ", ".join(liste)
+
+        # Update in DB schreiben
+        conn.execute(
+            "UPDATE Trainer SET Abwesenheiten = ? WHERE id = ?",
+            (neuer_text, id_)
+        )
+
+        return neuer_text
+
+
+
+def main():
+    import BckE.Modelle.Trainer as Trainer
+    with sqlite3.connect(DB) as conn:
+        #create_table()
         #insert_sample(conn)
         #azubi = GFD.generate_azubi()
         #insert_Azubi(azubi)
-        print("Aktuelle Einträge in Azubi:")
-        print_all()
+        Trainer = Trainer.Trainer()
+        Trainer.name = "Netanyahu"
+        Trainer.vorname = "Bibi"
+        Trainer.abwesenheiten = "9, 11"
+        insert_Trainer(Trainer)
+        #add_absence(1, [str(2), str(3), str(4)])
+        #change_absence(1, [str(3)])
 
+        print("Aktuelle Einträge in Trainer:")
+        #get_all_Trainers()
+        #print_all()
+
+#main()
 #if __name__ == "__main__":
-#    main()
-with sqlite3.connect(DB) as conn:
-    create_table(conn)
+#main()
+#print(get_all_Trainers())
+
