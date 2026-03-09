@@ -11,10 +11,10 @@ import inspect
 @dataclass
 class Kurs:
     _name: str = field(default="")
-    _gruppe: list = field(default="")
-    _trainer: object = field(default="")
-    _raum: object = field(default="")
-    _modul: object = field(default="")
+    _gruppe: str = field(default="")
+    _trainer: str = field(default="")
+    _raum: str = field(default="")
+    _modul: str = field(default="")
     _start: int = field(default=0)
     _end: int = field(default=0)
 

@@ -71,10 +71,47 @@ def createAzubiCal(block):
 
     return newAvailableDays
 
+def get_available_weeks(block_plan):
+    available_weeks = []
+    for i, day in enumerate(block_plan):
+        startDay = block_plan.get(day)
+        endDay = block_plan.get(day + 4)
+        if endDay is not None and startDay is not None:
+            dif = endDay - startDay
+            dif: timedelta
+            if dif.days == 4:
+                #print(startDay, "-", endDay)
+                available_weeks.append(
+                    {
+                                 "week_numb": i,
+                                 "start": startDay,
+                                 "end": endDay
+                    }
+                )
+    return available_weeks
 
 #print(createAzubiCal("A"))
 
 
+# from datetime import date
+#
+# # Deine Liste vorbereiten
+# booking_list = []
+#
+# # Beispiel-Werte (in einer Schleife)
+# for i in range(5):
+#     start_dt = date(2025, 9, 15)  # Dein Startdatum
+#     end_dt = date(2025, 9, 20)  # Dein Enddatum
+#
+#     # Als Dictionary zur Liste hinzufügen
+#     booking_list.append({
+#         "id": i,
+#         "start": start_dt,
+#         "end": end_dt
+#     })
+#
+# # Zugriff auf den ersten Eintrag:
+# print(booking_list[0]["start"])
 
 
 

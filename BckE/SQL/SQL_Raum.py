@@ -1,6 +1,6 @@
 import sqlite3
 from datetime import date
-import config_Raum as import_Räume
+import BckE.SQL.config_Raum as import_Räume
 from pathlib import Path
 from BckE.Modelle.Raum import Raum
 
@@ -49,8 +49,8 @@ def get_all_Rooms():
     with sqlite3.connect(DB) as conn:
         cur = conn.execute("SELECT * FROM Raum")
         rows = cur.fetchall()
-        for r in rows:
-            print(r)
+        #for r in rows:
+         #   print(r)
         return rows
 
 def get_Room(id_):

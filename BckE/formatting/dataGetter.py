@@ -4,6 +4,7 @@ from datetime import datetime
 import BckE.SQL.SQL_Trainer as Sql_Trainer
 import BckE.SQL.SQL_Azubi as Sql_Azubi
 import BckE.SQL.SQL_Gruppe as Sql_Gruppe
+import BckE.SQL.SQL_Raum as Sql_Rooms
 import BckE.SQL.config_Module
 
 
@@ -58,6 +59,22 @@ def get_Azubis():
         }
         array = [x.strip() for x in set[5].split(",")]
         formated_dataObj.update({"attendedModules": array})
+        formated_dataArray.append(formated_dataObj)
+    return formated_dataArray
+
+def get_Rooms():
+    data = Sql_Rooms.get_all_Rooms()
+    formated_dataArray = []
+
+    for set in data:
+        formated_dataObj = {
+            "id": set[0],
+            "name": set[1],
+            "plätze": set[2],
+            "istPCRaum": set[3],
+        }
+        array = [x.strip() for x in set[4].split(",")]
+        formated_dataObj.update({"abwesenheiten": array})
         formated_dataArray.append(formated_dataObj)
     return formated_dataArray
 
