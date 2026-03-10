@@ -60,6 +60,12 @@ def get_Trainer(id_):
         row = cur.fetchone()
         return row
 
+def get_Trainer_absence(id_):
+    with sqlite3.connect(DB) as conn:
+        cur = conn.execute("SELECT Abwesenheiten FROM Trainer WHERE id=?", (id_,))
+        row = cur.fetchone()
+        return row
+
 
 def change_absence(id_, toRemove):
     with sqlite3.connect(DB) as conn:

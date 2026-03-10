@@ -36,15 +36,18 @@ def createCal():
     return dayDateMap
 
 
-def book_absence(absence):
+
+#Erstellt einen Kalender der die absence rausnimmt
+def create_calendar_with_absence(absences):
     days = createCal()
     newAvailableDays = days.copy()
     for day, date in days.items():
-        if (day in absence):
+        if (day in absences):
             newAvailableDays.pop(day)
 
     return newAvailableDays
 
+#Nimmt den gebuchten Kalender
 def remove_absence(absenceToRemove, bookedCalendar):
     initCalendar = createCal()
     for day in absenceToRemove:
@@ -53,13 +56,40 @@ def remove_absence(absenceToRemove, bookedCalendar):
 
     return bookedCalendar
 
+def get_available_weeks(calendar):
+    available_weeks = []
+    count = 1
+    for i, startDay in enumerate(calendar):
+        startDate = calendar.get(startDay)
+        endDay = startDay + 4
+        endDate = calendar.get(endDay)
+        if endDate is not None and startDate is not None :
+            dif = endDate - startDate
+            dif: timedelta
+            if dif.days == 4:
+                available_weeks.append(
+                    {
+                                 "week_numb": count,
+                                 "start": {
+                                     "day": startDay,
+                                     "date": startDate,
+                                 },
+                                 "end": {
+                                     "day": endDay,
+                                     "endDate": endDate,
+                                 }
+                    }
+                )
+                count += 1
+    return available_weeks
+
 
 
 
 print(createCal())
 
 
-bookedHolidayCalendar = (book_absence([2, 0, 4, 1]))
+#bookedHolidayCalendar = (book_absence([2, 0, 4, 1]))
 #print(bookedHolidayCalendar)
 #restoredCalendar = remove_absence([1], bookedHolidayCalendar)
 #print(restoredCalendar)

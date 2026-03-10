@@ -71,23 +71,32 @@ def createAzubiCal(block):
 
     return newAvailableDays
 
+
 def get_available_weeks(block_plan):
     available_weeks = []
-    for i, day in enumerate(block_plan):
-        startDay = block_plan.get(day)
-        endDay = block_plan.get(day + 4)
-        if endDay is not None and startDay is not None:
-            dif = endDay - startDay
+    count = 1
+    for i, startDay in enumerate(block_plan):
+        startDate = block_plan.get(startDay)
+        endDay = startDay + 4
+        endDate = block_plan.get(endDay)
+        if endDate is not None and startDate is not None :
+            dif = endDate - startDate
             dif: timedelta
             if dif.days == 4:
-                #print(startDay, "-", endDay)
                 available_weeks.append(
                     {
-                                 "week_numb": i,
-                                 "start": startDay,
-                                 "end": endDay
+                                 "week_numb": count,
+                                 "start": {
+                                     "day": startDay,
+                                     "date": startDate,
+                                 },
+                                 "end": {
+                                     "day": endDay,
+                                     "endDate": endDate,
+                                 }
                     }
                 )
+                count += 1
     return available_weeks
 
 #print(createAzubiCal("A"))

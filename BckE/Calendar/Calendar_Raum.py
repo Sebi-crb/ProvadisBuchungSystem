@@ -53,6 +53,33 @@ def remove_absence(absenceToRemove, bookedCalendar):
     return bookedCalendar
 
 
+def get_available_weeks(calendar):
+    available_weeks = []
+    count = 1
+    for i, startDay in enumerate(calendar):
+        startDate = calendar.get(startDay)
+        endDay = startDay + 4
+        endDate = calendar.get(endDay)
+        if endDate is not None and startDate is not None :
+            dif = endDate - startDate
+            dif: timedelta
+            if dif.days == 4:
+                available_weeks.append(
+                    {
+                                 "week_numb": count,
+                                 "start": {
+                                     "day": startDay,
+                                     "date": startDate,
+                                 },
+                                 "end": {
+                                     "day": endDay,
+                                     "endDate": endDate,
+                                 }
+                    }
+                )
+                count += 1
+    return available_weeks
+
 
 
 #print(createCal())

@@ -1,33 +1,13 @@
-import random
-import BckE.SQL.config_Raum as Räume
+from datetime import date
 
+def ist_mindestens_eine_woche_her(datum1, datum2):
+    # Die Subtraktion liefert ein timedelta-Objekt zurück
+    differenz = abs((datum1 - datum2).days)
+    return differenz >= 7, differenz
 
+# Beispielanwendung
+d1 = date(2026, 3, 1)
+d2 = date(2026, 3, 8)
 
-räume = Räume.get_Räume()
-"INSERT INTO Räume (Name, Plätze, IstPcRaum, Abwesenheiten) VALUES (?, ?, ?, ?)",
-# Einen Raum über ID abrufen
-räume[1]                    # → {'id': 1, 'name': 'Raum 1', ...}
-
-# Einzelne Werte
-räume[1]['name']            # → 'Raum 1'
-räume[1]['Plätze']          # → '18'
-räume[1]['pcKennzeichnung'] # → True
-
-# Alle Räume durchlaufen
-for id, raum in räume.items():
-    print(raum['name'],raum['Plätze'], raum['pcKennzeichnung'])
-
-
-# Nur Räume mit PC
-mit_pc = {id: r for id, r in räume.items() if r['pcKennzeichnung']}
-
-# Nur Räume ohne PC
-ohne_pc = {id: r for id, r in räume.items() if not r['pcKennzeichnung']}
-
-# Raum mit bestimmter Mindestanzahl Plätze
-große_räume = {id: r for id, r in räume.items() if int(r['Plätze']) >= 24}
-
-
-
-
-
+if ist_mindestens_eine_woche_her(d1, d2):
+    print(ist_mindestens_eine_woche_her(d1, d2))
