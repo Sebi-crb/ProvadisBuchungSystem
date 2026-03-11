@@ -77,15 +77,15 @@ def get_all():
 
 def main():
     with sqlite3.connect(DB) as conn:
-        create_table(conn)
+        #create_table()
         #insert_sample(conn)
         #azubi = GFD.generate_azubi()
         #insert_Azubi(azubi)
         print("Aktuelle Einträge in Azubi:")
-        get_all()
+        print(get_all().__len__())
 #drop_table()
-print(get_all())
-#if __name__ == "__main__":
-    #main()
-#with sqlite3.connect(DB) as conn:
-#    create_table(conn)
+#print(get_all())
+if __name__ == "__main__":
+   main()
+
+

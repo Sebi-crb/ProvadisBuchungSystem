@@ -31,6 +31,11 @@ for id, modul in con_moduls.items():
     modul_list.append(modul['dauer'])
     #print(samples)
 
+for i, modul in modul_list:
+    dauer = modul['dauer']
+    for group in groups:
+        group_id = group['block']
+
 
 def find_group_trainer_modul_match(gruppe, dauer):
     if dauer == 3 or dauer == 5:
