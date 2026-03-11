@@ -33,12 +33,11 @@ def create_table():
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             Name TEXT NOT NULL,
             GruppenID TEXT NOT NULL,
-            StartDate DATETIME NOT NULL
+            StartDate DATETIME NOT NULL,
             EndDate DATETIME NOT NULL,
             TrainerID Text NOT NULL,
             Raum Text NOT NULL,
-            ModulID Text NOT NULL,
-            
+            ModulID Text NOT NULL
         );
         """)
         conn.commit()
@@ -47,10 +46,13 @@ def delete(id_):
     with sqlite3.connect(DB) as c: c.execute("DELETE FROM Gruppe WHERE id=?", (id_,))
 
 def insert_Kurs(Kurs):
+    create_table()
     with sqlite3.connect(DB) as conn:
         samples = [
-            (Kurs.name, Kurs.gruppe, Kurs.start, Kurs.end, Kurs.trainer, Kurs.raum, Kurs.modul),
+            (Kurs.name, Kurs.gruppe['id'], Kurs.start, Kurs.end, Kurs.trainer['id'], Kurs.raum, Kurs.modul),
         ]
+        insert_kurs_dates_into_trainer(Kurs.trainer, Kurs.start, Kurs.end)
+        insert_kurs_dates_into_gruppen(Kurs.gruppe, Kurs.start, Kurs.end)
         conn.executemany(
             "INSERT INTO Kurse (Name, GruppenID, StartDate, EndDate, TrainerID, Raum, ModulID) VALUES (?, ?, ?, ?, ?, ?, ?)",
             samples
@@ -113,21 +115,27 @@ def drop_table():
         create_table()
 
 def insert_kurs_dates_into_trainer(trainerID_, start_date_, end_date_):
+
     trainer_cal = Calendar_Trainer.createCal()
     key_of_start_date = get_key_for_date(trainer_cal, start_date_)
     key_of_end_date = get_key_for_date(trainer_cal, end_date_)
     absences = list(range(key_of_start_date, key_of_end_date + 1))
-    SQL_Trainer.add_absence(trainerID_, absences)
+    SQL_Trainer.add_absence(trainerID_['id'], absences)
 
 
 def insert_kurs_dates_into_gruppen(gruppenID_, start_date_, end_date_):
-    block_tup = SQL_Gruppe.get_block(gruppenID_)
-    block = block_tup[0]
-    a_calendar = Calendar_Azubi.createAzubiCal(block)
-    key_of_start_date = get_key_for_date(a_calendar, start_date_)
-    key_of_end_date = get_key_for_date(a_calendar, end_date_)
-    absences = list(range(key_of_start_date, key_of_end_date + 1))
-    SQL_Gruppe.add_absence(gruppenID_, absences)
+    #try:
+        block_tup = SQL_Gruppe.get_block(gruppenID_['id'])
+        block = block_tup[0]
+        a_calendar = Calendar_Azubi.createAzubiCal(block)
+        key_of_start_date = get_key_for_date(a_calendar, start_date_)
+        key_of_end_date = get_key_for_date(a_calendar, end_date_)
+        #print(type(key_of_end_date), key_of_end_date)
+        absences = list(range(key_of_start_date, key_of_end_date + 1))
+        SQL_Gruppe.add_absence(gruppenID_['id'], absences)
+    #except:
+        #print("Datum wurde nicht im Azubi Kalendar gefunden")
+
 
 
 
@@ -138,7 +146,7 @@ def get_key_for_date(dates_dict, target_date):
             return key
     return None
 
-insert_kurs_dates_into_gruppen(1, date(2025, 9, 1), date(2025, 9, 3))
+#insert_kurs_dates_into_gruppen(1, date(2025, 9, 1), date(2025, 9, 3))
 
 #insert_kurs_dates_into_trainer(1, date(2025, 9, 1), date(2025, 9, 3))
 

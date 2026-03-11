@@ -49,10 +49,10 @@ def insert_AzubiGruppe(Gruppe):
                 azubiListstr += str(a) + ", "
 
         samples = [
-            (Gruppe.name, Gruppe.block, azubiListstr, attendedModstr),
+            (Gruppe.name, Gruppe.block, azubiListstr, attendedModstr, ""),
         ]
         conn.executemany(
-            "INSERT INTO Gruppe (Name, Block, Azubis, AttendedModules, Abwesenheiten) VALUES (?, ?, ?, ?)",
+            "INSERT INTO Gruppe (Name, Block, Azubis, AttendedModules, Abwesenheiten) VALUES (?, ?, ?, ?, ?)",
         samples
         )
         conn.commit()
@@ -75,6 +75,7 @@ def drop_table():
     with sqlite3.connect(DB) as conn:
         conn.execute("DROP TABLE IF EXISTS Gruppe")
         conn.commit()
+        create_table(conn)
 
 def add_absence(id_, toAdd):
     with sqlite3.connect(DB) as conn:

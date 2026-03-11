@@ -158,7 +158,6 @@ def get_room_absences():
         }
         roomsList.append(room)
     return roomsList
-    print(roomsList)
 
 
 def get_room_available_weeks():
@@ -170,7 +169,7 @@ def get_room_available_weeks():
         calendar = raum_calendar.create_calendar_with_absence(absences)
         calendar_available_weeks = raum_calendar.get_available_weeks(calendar)
         roomCalendarMap.update({room.get("id"): calendar_available_weeks})
-    print(roomCalendarMap)
+    #print(roomCalendarMap)
     return roomCalendarMap
 
 def find_room_trainer_group_modul_match():
@@ -178,7 +177,7 @@ def find_room_trainer_group_modul_match():
      #   print(find_group_trainer_modul_match(group, dauer))
     group = groups[0]
     kurs_list = []
-    print(group)
+    #print(group)
 
     for modules in modul_list:
         for trainer in trainers:
