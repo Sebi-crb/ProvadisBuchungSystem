@@ -11,6 +11,8 @@ import BckE.formatting.dataGetter as dataGetter
 import BckE.Modelle.Kurs as Kurs
 import datetime
 
+from BckE.Calendar.Calendar_Azubi import createCal
+
 con_moduls = cModule.get_Modules()
 modul_list = {}
 
@@ -28,7 +30,10 @@ for id, modul in con_moduls.items():
     modul_list.update({id: modul['dauer']})
 
 
-print(modul_list)
+#print(modul_list)
+
+
+
 
 def find_group_trainer_modul_match(gruppe, dauer):
     if dauer == 3 or dauer == 5:
@@ -36,27 +41,30 @@ def find_group_trainer_modul_match(gruppe, dauer):
     elif dauer == 10:
         neededWeeks = 2
     group_block = gruppe['block']
-    if (group_block == 'A'):
-        azubi_available_weeks = azubi_calendar.get_available_weeks(azubi_calendar_BlockA)
-        for trainer in trainers:
-            absences = SQL_Trainer.get_Trainer_absence(trainer['id'])
+    azubi_available_weeks = azubi_calendar.get_available_weeks(
+        azubi_calendar_BlockA if group_block == 'A' else
+        azubi_calendar_BlockB if group_block == 'B' else
+        azubi_calendar_BlockC
+    )
+    for trainer in trainers:
+        absences = SQL_Trainer.get_Trainer_absence(trainer['id'])
 
-            result = []
-            for tup in absences:
-                s = tup
-                if not s:
-                    continue
-                for part in s.split(','):
-                    part = part.strip()
-                    if part:
-                        result.append(int(part))
-            absences = result
-            trainer_cal_with_absences = trainer_Calender.create_calendar_with_absence(absences)
-            trainer_available_weeks = trainer_Calender.get_available_weeks(trainer_cal_with_absences)
-            # matchingDate = getFirstTrainerMatch(neededWeeks, trainer_available_weeks, azubi_available_weeks)
-            # print(matchingDate)
-            matchingDates = getAllTrainerMatches(neededWeeks, trainer_available_weeks, azubi_available_weeks, trainer['id'])
-            return matchingDates
+        result = []
+        for tup in absences:
+            s = tup
+            if not s:
+                continue
+            for part in s.split(','):
+                part = part.strip()
+                if part:
+                    result.append(int(part))
+        absences = result
+        trainer_cal_with_absences = trainer_Calender.create_calendar_with_absence(absences)
+        trainer_available_weeks = trainer_Calender.get_available_weeks(trainer_cal_with_absences)
+        # matchingDate = getFirstTrainerMatch(neededWeeks, trainer_available_weeks, azubi_available_weeks)
+        # print(matchingDate)
+        matchingDates = getFirstTrainerMatch(neededWeeks, trainer_available_weeks, azubi_available_weeks)
+        return matchingDates
 
 
 def getAllTrainerMatches(neededWeeks, trainer_available_weeks, azubi_available_weeks, trainerID):
@@ -163,15 +171,31 @@ def get_room_available_weeks():
     print(roomCalendarMap)
     return roomCalendarMap
 
-def find_room_trainer_group_match():
-    print(type(modul_list))
-    for module in modul_list:
-        moduleDauer = modul_list[module]
-        for group in groups:
-            groupTrainerModulMatch = find_group_trainer_modul_match(group, int(moduleDauer))
+def find_room_trainer_group_modul_match():
+    #for group in groups:
+     #   print(find_group_trainer_modul_match(group, dauer))
+    group = groups[0]
+    print(group)
 
-    print(groupTrainerModulMatch)
+    for modules in modul_list:
+        for trainer in trainers:
+            trainer_cal = trainer_Calender.get_available_weeks(trainer_Calender.create_calendar_with_absence(SQL_Trainer.get_Trainer_absence(trainer.get("id"))))
+
+            #print(trainer_cal)
+            azubi_cal = azubi_calendar.get_available_weeks(azubi_calendar.createAzubiCal(group.get("block")))
+            #print(azubi_cal)
+            dauer = modul_list[modules]
+            if(dauer == 5):
+                match = getFirstTrainerMatch(1, trainer_cal, azubi_cal)
+            else:
+                match = getFirstTrainerMatch(2, trainer_cal, azubi_cal)
+            print(match)
+
+            break
+        break
 
 
 
-find_room_trainer_group_match()
+find_room_trainer_group_modul_match()
+
+#find_room_trainer_group_modul_match(5)
