@@ -41,11 +41,17 @@ def createCal():
 def create_calendar_with_absence(absences):
     days = createCal()
     newAvailableDays = days.copy()
+    #print(newAvailableDays)
     for day, date in days.items():
+        #print(day, date)
         if (day in absences):
             newAvailableDays.pop(day)
+    actuallyNewAvailableDays = newAvailableDays.copy()
 
-    return newAvailableDays
+    return actuallyNewAvailableDays
+
+
+
 
 #Nimmt den gebuchten Kalender
 def remove_absence(absenceToRemove, bookedCalendar):
@@ -86,7 +92,7 @@ def get_available_weeks(calendar):
 
 
 
-print(createCal())
+#print(createCal())
 
 
 #bookedHolidayCalendar = (book_absence([2, 0, 4, 1]))

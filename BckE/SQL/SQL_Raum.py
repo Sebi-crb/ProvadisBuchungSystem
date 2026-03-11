@@ -29,6 +29,8 @@ def create_table():
         """)
         conn.commit()
 
+
+
 def delete(id_):
     with sqlite3.connect(DB) as c: c.execute("DELETE FROM Raum WHERE id=?", (id_,))
 
@@ -50,7 +52,7 @@ def get_all_Rooms():
         cur = conn.execute("SELECT * FROM Raum")
         rows = cur.fetchall()
         #for r in rows:
-         #   print(r)
+        #    print(r)
         return rows
 
 def get_Room(id_):
@@ -58,6 +60,32 @@ def get_Room(id_):
         cur = conn.execute("SELECT * FROM Raum WHERE id=?", (id_,))
         row = cur.fetchone()
         return row
+
+
+def get_room_IDs():
+    with sqlite3.connect(DB) as conn:
+        cur = conn.execute("SELECT id FROM Raum")
+        rows = cur.fetchall()
+        result = []
+        return rows
+
+def get_room_absence(id_):
+        with sqlite3.connect(DB) as conn:
+            cur = conn.execute("SELECT Abwesenheiten FROM Raum WHERE id=?", (id_,))
+            row = cur.fetchone()
+            return row
+
+def get_PCKennung(id_):
+    with sqlite3.connect(DB) as conn:
+        cur = conn.execute("SELECT IstPcRaum FROM Raum WHERE id=?", (id_,))
+        row = cur.fetchone()
+        bool = [int(x.strip()) for x in row[0].split(',') if x.strip()]
+
+        if(bool[0] == 0):
+            return False
+        else:
+            return True
+
 
 
 def change_absence(id_, toRemove):
@@ -135,9 +163,9 @@ def main():
         #print("Aktuelle Einträge in Trainer:")
         #get_all_Trainers()
         #print_all()
-
+#print(get_PCKennung(12))
 #main()
 #if __name__ == "__main__":
-main()
-create_table()
+#main()
+#create_table()
 

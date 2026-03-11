@@ -30,6 +30,7 @@ export default function Calendar(props: { termine: any; gruppen: any }) {
   const [events, setEvents] = useState<EventSourceInput>(props.termine);
 
   useEffect(() => {
+    console.log(localStorage.getItem("role"));
     let finishedEvents: any = [];
     for (const termin of props.termine) {
       const start = new Date(termin?.start);

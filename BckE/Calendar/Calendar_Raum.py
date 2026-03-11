@@ -2,7 +2,7 @@ from datetime import timedelta
 
 from ortools.sat.python import cp_model
 
-import config
+import BckE.Calendar.config as config
 
 
 def get_available_days():
@@ -35,14 +35,17 @@ def createCal():
     return course_vars
 
 
-def book_absence(absence):
+def create_calendar_with_absence(absences):
     days = createCal()
     newAvailableDays = days.copy()
+    #print(newAvailableDays)
     for day, date in days.items():
-        if (day in absence):
+        #print(day, date)
+        if (day in absences):
             newAvailableDays.pop(day)
+    actuallyNewAvailableDays = newAvailableDays.copy()
 
-    return newAvailableDays
+    return actuallyNewAvailableDays
 
 def remove_absence(absenceToRemove, bookedCalendar):
     initCalendar = createCal()
@@ -85,7 +88,7 @@ def get_available_weeks(calendar):
 #print(createCal())
 
 
-bookedHolidayCalendar = (book_absence([2, 0, 4, 1]))
-print(bookedHolidayCalendar)
-restoredCalendar = remove_absence([1], bookedHolidayCalendar)
-print(restoredCalendar)
+#bookedHolidayCalendar = (book_absence([2, 0, 4, 1]))
+#print(bookedHolidayCalendar)
+#restoredCalendar = remove_absence([1], bookedHolidayCalendar)
+#print(restoredCalendar)

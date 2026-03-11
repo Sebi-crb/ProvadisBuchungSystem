@@ -84,7 +84,7 @@ def get_Gruppen():
     for set in data:
         formated_dataObj = {
             "id": set[0],
-            "namen": set[1],
+            "name": set[1],
             "block" : set[2],
         }
         azubiArray = [x.strip() for x in set[3].split(",")]

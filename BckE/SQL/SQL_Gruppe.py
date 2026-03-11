@@ -85,4 +85,4 @@ def main():
 #drop_table()
 with sqlite3.connect(DB) as conn:
     create_table(conn)
-print(get_all())
+#print(get_all())
