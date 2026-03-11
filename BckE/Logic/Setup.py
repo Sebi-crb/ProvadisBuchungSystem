@@ -7,8 +7,10 @@ import BckE.Calendar.Calendar_Raum as raum_calendar
 import BckE.SQL.SQL_Trainer as SQL_Trainer
 import BckE.SQL.SQL_Gruppe as SQL_Gruppe
 import BckE.SQL.SQL_Raum as SQL_Raum
+import BckE.SQL.SQL_Kurs as SQL_Kurs
 import BckE.formatting.dataGetter as dataGetter
 import BckE.Modelle.Kurs as Kurs
+
 import datetime
 
 from BckE.Calendar.Calendar_Azubi import createCal
@@ -175,6 +177,7 @@ def find_room_trainer_group_modul_match():
     #for group in groups:
      #   print(find_group_trainer_modul_match(group, dauer))
     group = groups[0]
+    kurs_list = []
     print(group)
 
     for modules in modul_list:
@@ -189,8 +192,18 @@ def find_room_trainer_group_modul_match():
                 match = getFirstTrainerMatch(1, trainer_cal, azubi_cal)
             else:
                 match = getFirstTrainerMatch(2, trainer_cal, azubi_cal)
-            print(match)
+            #print(match)
 
+
+            kurs = Kurs.Kurs()
+            kurs.name = cModule.get_name(modules)
+            kurs.modul = modules
+            kurs.trainer = trainer
+            kurs.gruppe = group
+            kurs.start = match['start']['date']
+            kurs.end = match['end']['endDate']
+            kurs.raum = "Placeholder"
+            SQL_Kurs.insert_Kurs(kurs)
             break
         break
 

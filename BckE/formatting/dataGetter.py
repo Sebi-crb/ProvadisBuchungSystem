@@ -1,4 +1,4 @@
-from asyncio import print_call_graph
+#from asyncio import print_call_graph
 from datetime import datetime
 
 import BckE.SQL.SQL_Trainer as Sql_Trainer

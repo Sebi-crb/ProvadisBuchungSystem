@@ -216,3 +216,7 @@ modules = {
 
 def get_Modules():
     return modules
+
+def get_name(id):
+    return modules[id]['name']
+

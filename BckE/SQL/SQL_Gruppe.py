@@ -23,7 +23,8 @@ def create_table(conn):
         Name TEXT NOT NULL,
         Block TEXT NOT NULL,
         Azubis TEXT NOT NULL,
-        AttendedModules TEXT NOT NULL       
+        AttendedModules TEXT NOT NULL,
+        Abwesenheiten TEXT        
     );
     """)
     conn.commit()
@@ -51,23 +52,61 @@ def insert_AzubiGruppe(Gruppe):
             (Gruppe.name, Gruppe.block, azubiListstr, attendedModstr),
         ]
         conn.executemany(
-            "INSERT INTO Gruppe (Name, Block, Azubis, AttendedModules) VALUES (?, ?, ?, ?)",
+            "INSERT INTO Gruppe (Name, Block, Azubis, AttendedModules, Abwesenheiten) VALUES (?, ?, ?, ?)",
         samples
         )
         conn.commit()
 
 def get_all():
     with sqlite3.connect(DB) as conn:
-        cur = conn.execute("SELECT id, Name, Block, Azubis, AttendedModules FROM Gruppe")
+        cur = conn.execute("SELECT id, Name, Block, Azubis, AttendedModules, Abwesenheiten FROM Gruppe")
         rows = cur.fetchall()
         #for r in rows:
             #print(r)
         return rows
 
+def get_block(id_):
+    with sqlite3.connect(DB) as conn:
+        cur = conn.execute("SELECT Block FROM Gruppe WHERE id=?", (id_,))
+        row = cur.fetchone()
+        return row
+
 def drop_table():
     with sqlite3.connect(DB) as conn:
         conn.execute("DROP TABLE IF EXISTS Gruppe")
         conn.commit()
+
+def add_absence(id_, toAdd):
+    with sqlite3.connect(DB) as conn:
+        cur = conn.execute("SELECT Abwesenheiten FROM Gruppe WHERE id = ?", (id_,))
+        row = cur.fetchone()
+        if not row:
+            return
+
+        # Aktuelle Werte in Liste umwandeln
+        werte = row[0]  # z.B. "1, 3, 5"
+        liste = [x.strip() for x in werte.split(",") if x.strip()]
+
+        # Neue Werte hinzufügen (als Strings)
+        for w in toAdd:
+            w_str = str(w)
+            if w_str not in liste:
+                liste.append(w_str)
+
+        # Sortieren optional (falls du die Reihenfolge sauber halten willst)
+        liste = sorted(liste, key=lambda x: int(x))
+
+        # Neue Zeichenkette erzeugen
+        neuer_text = ", ".join(liste)
+
+        # Update in DB schreiben
+        conn.execute(
+            "UPDATE Gruppe SET Abwesenheiten = ? WHERE id = ?",
+            (neuer_text, id_)
+        )
+
+        return neuer_text
+
 
 def main():
     with sqlite3.connect(DB) as conn:
