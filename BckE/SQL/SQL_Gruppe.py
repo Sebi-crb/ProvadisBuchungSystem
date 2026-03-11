@@ -5,7 +5,7 @@ from pathlib import Path
 from BckE.Modelle.Gruppe import Gruppe
 
 PROJECT_ROOT_NAME = "ProvadisBuchungSystem"
-TARGET_SUBPATH = Path("BckE") / "SQL" / "WIP2.db"   # gewünschter Pfad ab Projektwurzel
+TARGET_SUBPATH = Path("BckE") / "SQL" / "Main.db"   # gewünschter Pfad ab Projektwurzel
 
 here = Path(__file__).resolve()
 proj_root = next((p for p in here.parents if p.name == PROJECT_ROOT_NAME), None)

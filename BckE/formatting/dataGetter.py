@@ -1,10 +1,10 @@
-#from asyncio import print_call_graph
 from datetime import datetime
 
 import BckE.SQL.SQL_Trainer as Sql_Trainer
 import BckE.SQL.SQL_Azubi as Sql_Azubi
 import BckE.SQL.SQL_Gruppe as Sql_Gruppe
 import BckE.SQL.SQL_Raum as Sql_Rooms
+import BckE.SQL.SQL_Kurs as Sql_Kurs
 import BckE.SQL.config_Module
 
 
@@ -97,4 +97,21 @@ def get_Gruppen():
 def get_Modules():
     data = BckE.SQL.config_Module.get_Modules()
     return data
+
+def get_Kurse():
+    data = Sql_Kurs.get_all_Kurse()
+    kurseArray = []
+    for set in data:
+        formated_dataObj = {
+            "id": set[0],
+            "titel": set[1],
+            "gruppenId": set[2],
+            "startDate": set[3],
+            "endDate": set[4],
+            "trainerId": set[5],
+            "raum": set[6],
+            "moduleId": set[7],
+        }
+        kurseArray.append(formated_dataObj)
+    return kurseArray
 

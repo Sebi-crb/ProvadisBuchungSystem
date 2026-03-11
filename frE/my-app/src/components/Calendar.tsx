@@ -15,47 +15,42 @@ export default function Calendar(props: { termine: any; gruppen: any }) {
 
   const [showAddPopup, setShowAddPopup] = useState(false);
 
-  const emptyEvent = {
-    title: "",
-    start: new Date(),
-    end: new Date(),
-    extendedProps: {
-      trainer: [],
-      group: [],
-      raum: "",
-    },
-  };
-  const [newEvent, setNewEvent] = useState(emptyEvent);
-
   const [events, setEvents] = useState<EventSourceInput>(props.termine);
 
   useEffect(() => {
     console.log(localStorage.getItem("role"));
     let finishedEvents: any = [];
-    for (const termin of props.termine) {
-      const start = new Date(termin?.start);
-      start.setHours(8, 0, 0, 0);
+    fetch("/api/kurs")
+      .then((res) => res.json())
+      .then((kurse) => {
+        console.log("data", kurse);
+        for (const kurs of kurse) {
+          const start = new Date(kurs?.startDate);
+          start.setHours(8, 0, 0, 0);
 
-      const end = new Date(termin?.end);
-      end.setHours(16, 30, 0, 0);
+          const end = new Date(kurs?.endDate);
+          end.setHours(16, 30, 0, 0);
 
-      console.log("gruppe", termin);
+          const formattedEvent = {
+            title: kurs?.titel,
+            start: start,
+            end: end,
+            extendedProps: {
+              trainerId: kurs?.trainerId,
+              groupId: kurs?.gruppenId,
+              raum: kurs?.raum,
+              moduleId: kurs?.moduleId,
+              id: kurs?.id,
+            },
+          };
 
-      const formattedEvent = {
-        title: termin?.title,
-        start: start,
-        end: end,
-        extendedProps: {
-          trainer: termin?.trainer,
-          group: termin?.gruppe,
-          raum: termin?.extendedProps?.raum,
-        },
-      };
-      finishedEvents.push(formattedEvent);
-    }
-    setEvents(finishedEvents);
-    console.log("events", finishedEvents);
-  }, [props.termine]);
+          finishedEvents.push(formattedEvent);
+        }
+        console.log("finishedEvents", finishedEvents);
+        setEvents(finishedEvents);
+        console.log("events", events);
+      });
+  }, []);
 
   function handleNewEvent(event: any) {
     event.start = new Date(event.start);

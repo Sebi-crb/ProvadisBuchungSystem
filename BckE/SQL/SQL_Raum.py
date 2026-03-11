@@ -5,7 +5,7 @@ from pathlib import Path
 from BckE.Modelle.Raum import Raum
 
 PROJECT_ROOT_NAME = "ProvadisBuchungSystem"
-TARGET_SUBPATH = Path("BckE") / "SQL" / "WIP2.db"   # gewünschter Pfad ab Projektwurzel
+TARGET_SUBPATH = Path("BckE") / "SQL" / "Main.db"   # gewünschter Pfad ab Projektwurzel
 
 here = Path(__file__).resolve()
 proj_root = next((p for p in here.parents if p.name == PROJECT_ROOT_NAME), None)
@@ -167,5 +167,5 @@ def main():
 #main()
 #if __name__ == "__main__":
 #main()
-#create_table()
+create_table()
 

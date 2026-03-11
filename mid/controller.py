@@ -34,10 +34,15 @@ def get_gruppenMitAzubis():
 
     return jsonify(gruppen)
 
+@app.route('/api/kurs', methods=['GET'])
+def get_Kurse():
+    kurse = dataGetter.get_Kurse()
+    return jsonify(kurse)
 @app.route('/api/modules', methods=['GET'])
 def get_modules():
     modules = dataGetter.get_Modules()
     return jsonify(modules)
+
 
 @app.route('/api/setHolidays', methods=['POST'])
 def set_holidays():

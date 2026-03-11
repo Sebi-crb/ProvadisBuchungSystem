@@ -5,7 +5,7 @@ from pathlib import Path
 from BckE.Modelle.Azubi import Azubi
 
 PROJECT_ROOT_NAME = "ProvadisBuchungSystem"
-TARGET_SUBPATH = Path("BckE") / "SQL" / "WIP2.db"   # gewünschter Pfad ab Projektwurzel
+TARGET_SUBPATH = Path("BckE") / "SQL" / "Main.db"   # gewünschter Pfad ab Projektwurzel
 
 here = Path(__file__).resolve()
 proj_root = next((p for p in here.parents if p.name == PROJECT_ROOT_NAME), None)
@@ -85,7 +85,8 @@ def main():
         print(get_all().__len__())
 #drop_table()
 #print(get_all())
-if __name__ == "__main__":
-   main()
+#if __name__ == "__main__":
+#   main()
+create_table()
 
 

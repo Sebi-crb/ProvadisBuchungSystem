@@ -7,7 +7,7 @@ import BckE.Modelle.Trainer as Trainer
 
 
 PROJECT_ROOT_NAME = "ProvadisBuchungSystem"
-TARGET_SUBPATH = Path("BckE") / "SQL" / "WIP2.db"   # gewünschter Pfad ab Projektwurzel
+TARGET_SUBPATH = Path("BckE") / "SQL" / "Main.db"   # gewünschter Pfad ab Projektwurzel
 
 here = Path(__file__).resolve()
 proj_root = next((p for p in here.parents if p.name == PROJECT_ROOT_NAME), None)
@@ -36,6 +36,7 @@ def delete(id_):
     with sqlite3.connect(DB) as c: c.execute("DELETE FROM Trainer WHERE id=?", (id_,))
 
 def insert_Trainer(Trainer):
+    create_table()
     with sqlite3.connect(DB) as conn:
         samples = [
             (Trainer.name, Trainer.vorname, Trainer.abwesenheiten),
@@ -126,6 +127,41 @@ def add_absence(id_, toAdd):
         return neuer_text
 
 
+def drop_table():
+    with sqlite3.connect(DB) as conn:
+        conn.execute("DROP TABLE IF EXISTS Trainer")
+        conn.commit()
+
+
+
+def insert_trainer_data():
+    import BckE.Modelle.Trainer as Trainer
+    Trainer = Trainer.Trainer()
+
+    nachnamen = [
+        "Horn", "Christoph-Chan", "Oxlong", "Winkler", "Bolika",
+        "Janus", "Hartmann", "Saar", "Redem", "Bino",
+        "Jet", "Bacon", "Lord", "Bilyty", "Lester"
+    ]
+
+    vornamen = [
+        "Gabe", "Jan", "Mike", "Rainer", "Anna",
+        "Hugh", "Fixie", "Pajeet", "Donot", "Al",
+        "Mit", "Chris-P", "Gai", "Diza", "Moe"
+    ]
+
+
+    for i in range(len(vornamen)):
+        t = Trainer
+        t.name = nachnamen[i]
+        t.vorname = vornamen[i]
+        t.abwesenheiten = ""
+        insert_Trainer(t)
+
+
+drop_table()
+insert_trainer_data()
+
 
 def main():
     import BckE.Modelle.Trainer as Trainer
@@ -151,4 +187,4 @@ def main():
 #main()
 #print(get_all_Trainers())
 
-#create_table()
+create_table()

@@ -1,12 +1,12 @@
 TODO
-	Kurs Generierung
-	Kurs Bearbeitung
-	Kurs Erstellung Manuell
-	Rollen Verteilung bestimmen
-	Rollen views einbauen
-	30 Module
-	250/lehrjahr = 750 gesamt
-	10-15 Trainer
+	Kurs Generierung - Done
+	Kurs Bearbeitung - Pending
+	Kurs Erstellung Manuell - Pending
+	Rollen Verteilung bestimmen - Done
+	Rollen views einbauen - Pending
+	30 Module - Pending
+	250/lehrjahr = 750 gesamt - Done
+	10-15 Trainer - Done
 
 PRIO
     Eren / Sebastian = Kursbuchung
