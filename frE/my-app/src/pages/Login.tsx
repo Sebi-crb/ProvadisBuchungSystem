@@ -1,8 +1,27 @@
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@mui/material";
 import Box from "@mui/material/Box";
 import TextField from "@mui/material/TextField";
 
 export default function Login() {
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const navigate = useNavigate();
+
+  const handleLogin = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (username === "user" && password === "user") {
+      localStorage.setItem("role", "user");
+      navigate("/home");
+    } else if (username === "admin" && password === "admin") {
+      localStorage.setItem("role", "admin");
+      navigate("/home");
+    } else {
+      alert("Ungültige Anmeldedaten");
+    }
+  };
+
   return (
     <Box
       sx={{
@@ -14,7 +33,8 @@ export default function Login() {
       }}
     >
       <Box
-        component="section"
+        component="form"
+        onSubmit={handleLogin}
         sx={{
           backgroundColor: "#026291",
           width: "20vw",
@@ -33,6 +53,8 @@ export default function Login() {
           id="username"
           label="Username"
           variant="outlined"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
           sx={{
             margin: "20px",
             "& .MuiOutlinedInput-root": {
@@ -50,6 +72,8 @@ export default function Login() {
           label="Password"
           type="password"
           variant="outlined"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
           sx={{
             margin: "20px",
             "& .MuiOutlinedInput-root": {
@@ -62,21 +86,18 @@ export default function Login() {
             "& .MuiOutlinedInput-input": { color: "white" },
           }}
         />
-        <input 
-          type="submit" 
-          value="Login"
-          style={{
+        <Button
+          type="submit"
+          variant="contained"
+          sx={{
             marginTop: "20px",
-            padding: "10px 20px",
             backgroundColor: "white",
             color: "#026291",
-            border: "none",
-            borderRadius: "4px",
-            cursor: "pointer",
-            fontSize: "16px",
-            fontWeight: "bold",
+            "&:hover": { backgroundColor: "#f0f0f0" },
           }}
-        />
+        >
+          Login
+        </Button>
       </Box>
     </Box>
   );
