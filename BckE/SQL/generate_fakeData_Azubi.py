@@ -44,9 +44,8 @@ class Generate_Fake_Data:
         SQL_Azubi.insert_Azubi(self.generate_azubi())
 
 
-if(__name__ == "__main__"):
+def main():
     SQL_Azubi.create_table()
-
     GFD = Generate_Fake_Data()
     for lehrjahr in GFD.lehrjahre:
         a_list = GFD.generate_azubis(250, lehrjahr)

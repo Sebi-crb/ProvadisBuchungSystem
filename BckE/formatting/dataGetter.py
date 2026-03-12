@@ -5,7 +5,7 @@ import BckE.SQL.SQL_Azubi as Sql_Azubi
 import BckE.SQL.SQL_Gruppe as Sql_Gruppe
 import BckE.SQL.SQL_Raum as Sql_Rooms
 import BckE.SQL.SQL_Kurs as Sql_Kurs
-import BckE.SQL.config_Module
+import BckE.SQL.config_Module_old
 
 
 def get_Trainers():
@@ -95,7 +95,7 @@ def get_Gruppen():
     return formaed_dataArray
 
 def get_Modules():
-    data = BckE.SQL.config_Module.get_Modules()
+    data = BckE.SQL.config_Module_old.get_Modules()
     return data
 
 def get_Kurse():

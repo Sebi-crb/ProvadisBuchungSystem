@@ -12,7 +12,7 @@ Fixes gegenüber alter Version:
 
 from datetime import timedelta
 
-import BckE.SQL.config_Module as cModule
+import BckE.SQL.config_Module_old as cModule
 import BckE.Calendar.Calendar_Azubi as azubi_calendar
 import BckE.Calendar.Calendar_Trainer as trainer_calender
 import BckE.Calendar.Calendar_Raum as raum_calendar

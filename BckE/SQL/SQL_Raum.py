@@ -35,6 +35,7 @@ def delete(id_):
     with sqlite3.connect(DB) as c: c.execute("DELETE FROM Raum WHERE id=?", (id_,))
 
 def insert_Räume():
+    create_table()
     with sqlite3.connect(DB) as conn:
         Räume = import_Räume.get_Räume()
         for id, raum in Räume.items():

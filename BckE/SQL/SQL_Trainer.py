@@ -135,6 +135,7 @@ def drop_table():
 
 
 def insert_trainer_data():
+    create_table()
     import BckE.Modelle.Trainer as Trainer
     Trainer = Trainer.Trainer()
 

@@ -218,7 +218,7 @@ def main():
     Gruppe_SQL.get_all()
 
 
-if __name__ == '__main__':
-    main()
+#if __name__ == '__main__':
+#    main()
 #print(convert_db_Azubi(list_azubis))
 #print(convert_db_Azubi(get_db_Azubis()))
