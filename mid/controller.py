@@ -4,7 +4,7 @@ from flask_cors import CORS
 import BckE.formatting.dataGetter as dataGetter
 import BckE.writer.dataWriter as dataWriter
 import BckE.Logic.Manualbooking as Manualbooking
-import BckE.Logic.Editbooking as Editbooking
+import BckE.Logic.obsolete_Editbooking as Editbooking
 app = Flask(__name__)
 CORS(app)
 
