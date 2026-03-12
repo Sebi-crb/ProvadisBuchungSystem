@@ -22,7 +22,7 @@ export default function Sidebar() {
         }}
       >
         <Button onClick={() => null} sx={{ color: "white", marginTop: 5 }}>
-          User
+          {sessionStorage.getItem("role") || "User"}
         </Button>
         <Button
           onClick={() => navigate("/home")}

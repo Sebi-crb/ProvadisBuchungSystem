@@ -151,13 +151,6 @@ export default function AddPopup({
         </div>
         <div>
           <Autocomplete
-            multiple disablePortal options={trainerOptions} sx={{ width: 300 }}
-            renderInput={(params) => <TextField {...params} label="Trainer" />}
-            onChange={(_, newValue) => setTrainer(newValue.map((o) => o.label))}
-          />
-        </div>
-        <div>
-          <Autocomplete
             disablePortal options={moduleOptions} sx={{ width: 300 }}
             renderInput={(params) => <TextField {...params} label="Modul" />}
             value={modul} 
