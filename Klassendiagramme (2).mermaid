@@ -1,0 +1,112 @@
+classDiagram
+    class Azubi {
+        -String _name
+        -String _vorname
+        -String _ausbildungsunternehmen
+        -int _ausbildungsStart
+        -list _attendedModules
+        -list _abwesenheiten
+        -String _block
+        -String _id
+        +name: String
+        +vorname: String
+        +ausbildungsunternehmen: String
+        +ausbildungsStart: int
+        +attendedModules: list
+        +abwesenheiten: list
+        +block: String
+        +id: String
+        +strip(string) String
+        +__str__() String
+    }
+
+    class Gruppe {
+        -String _name
+        -list _azubiList
+        -String _block
+        -String _attendedModules
+        +int countAzubis
+        +name: String
+        +block: String
+        +attendedModules: String
+        +azubiList: list
+        +__init__(name, azubiList)
+        +setCount(listlength)
+        +getAzubiCount() int
+        +strip(string) String
+        +__str__() String
+    }
+
+    class Trainer {
+        -String _name
+        -String _vorname
+        -list _modulTeacher
+        -list _abwesenheiten
+        -list _blockedModul
+        +name: String
+        +vorname: String
+        +modulTeacher: list
+        +abwesenheiten: list
+        +blockedModul: list
+        +strip(string) String
+        +__str__() String
+    }
+
+    class Kurs {
+        -String _name
+        -String _gruppe
+        -String _trainer
+        -String _raum
+        -String _modul
+        -int _start
+        -int _end
+        +name: String
+        +gruppe: String
+        +trainer: String
+        +raum: String
+        +modul: String
+        +start: int
+        +end: int
+        +strip(string) String
+        +__str__() String
+    }
+
+    class Modul {
+        -String _name
+        -String _beschreibung
+        -float _dauer
+        -int _zuordnungLernjahr
+        -list _optionaleVorgängermodule
+        -list _verpflichtendeVorgängermodule
+        -bool _pcKennzeichnung
+        +name: String
+        +beschreibung: String
+        +dauer: float
+        +zuordnungLernjahr: int
+        +optionaleVorgängermodule: list
+        +verpflichtendeVorgängermodule: list
+        +pcKennzeichnung: bool
+        +strip(string) String
+        +__str__() String
+    }
+
+    class Raum {
+        -String _name
+        -bool _isPC
+        -list _isBlocked
+        +name: String
+        +isPC: bool
+        +isBlocked: list
+        +strip(string) String
+        +__str__() String
+    }
+
+    %% Beziehungen
+    Gruppe "1" o-- "0..*" Azubi : enthält
+    Kurs "1" --> "1" Gruppe : wird gebucht für
+    Kurs "1" --> "1" Trainer : wird unterrichtet von
+    Kurs "1" --> "1" Raum : findet statt in
+    Kurs "1" --> "1" Modul : basiert auf
+    Modul "0..*" ..> "0..*" Modul : optionaleVorgänger / verpflichtendeVorgänger
+    Trainer "1" --> "0..*" Modul : kann unterrichten
+    Azubi "0..*" --> "0..*" Modul : hat absolviert
