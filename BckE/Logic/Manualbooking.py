@@ -312,8 +312,8 @@ def get_available_slots(group: dict, modul_id: int) -> list:
             continue
 
         slots.append({
-            "start": start,
-            "end":   end,
+            "start": str(start),
+            "end":   str(end),
             "weeks": needed_weeks,
         })
 

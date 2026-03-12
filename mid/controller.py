@@ -1,3 +1,5 @@
+import datetime
+
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 import BckE.formatting.dataGetter as dataGetter
@@ -54,7 +56,7 @@ def set_holidays():
     newAbsenceList = dataWriter.add_absence(start, end, trainerId)
     return jsonify(newAbsenceList)
 
-@app.route('/api/modules/<int:groupId>', methods=['GET'])
+@app.route('/api/getAllowedModules/<int:groupId>', methods=['GET'])
 def get_allowed_modules(groupId):
     allModules = dataGetter.get_Modules()
     allowedModules = []
@@ -62,8 +64,29 @@ def get_allowed_modules(groupId):
         mId = allModules[module]['id']
         if Manualbooking.check_modul_valid(groupId, mId):
             allowedModules.append(module)
-    print("gay")
     return jsonify(allowedModules)
+
+@app.route('/api/getGroupModuleTimeSlot/<int:groupId>/<int:moduleId>', methods=['GET'])
+def getGroupModuleTimeSlot(groupId, moduleId):
+    allGroups = dataGetter.get_Gruppen()
+    groupObj= {}
+    for group in allGroups:
+        if group['id'] == groupId:
+            groupObj = group
+            break
+    print(None)
+    return jsonify(Manualbooking.get_available_slots(groupObj, moduleId))
+
+
+@app.route('/api/getTrainerForSlot', methods=['POST'])
+def getTrainerForSlot():
+    data = request.json
+    print(data)
+    start = data['start']
+    modId = data['moduleId']
+    formatedStart = datetime.strptime(start, "%Y-%m-%d")
+    slots = Manualbooking.get_available_trainers_for_slot(formatedStart, modId)
+    return jsonify(slots)
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000)
