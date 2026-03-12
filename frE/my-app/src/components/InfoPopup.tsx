@@ -3,7 +3,6 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import AddPopup from "./AddPopup";
 
-
 export default function Popup({
   onClose,
   event,
@@ -13,31 +12,54 @@ export default function Popup({
 }) {
   const navigate = useNavigate();
   const formattedEventStructure = {
-    titel : event.title,
-    start : event.start,
-    end : event.end,
-    groupId : event.extendedProps.groupId
-}
+    titel: event.title,
+    start: event.start,
+    end: event.end,
+    groupId: event.extendedProps.groupId,
+  };
   const [showAddPopup, setShowAddPopup] = useState(false);
 
+  const [trainer, setTrainer] = useState(null);
+  const [gruppe, setGruppe] = useState(null);
+
   useEffect(() => {
-    let moduleId = event.extendedProps.moduleId
-    const kurse = JSON.parse(sessionStorage.getItem("kurse"))
-    let kursData = kurse[moduleId]  
-    console.log("kursDaten",kursData)
+    let moduleId = event.extendedProps.moduleId;
+    const kurse = JSON.parse(sessionStorage.getItem("kurse"));
+    let kursData = kurse[moduleId];
+
+    fetch("/api/trainers")
+      .then((res) => res.json())
+      .then((data) => {
+        data.forEach((trainerIndex) => {
+          if (trainerIndex.id == event.extendedProps.trainerId) {
+            console.log(trainerIndex);
+            setTrainer(trainerIndex);
+          }
+        });
+      })
+      .catch((err) => console.error("Fetch error:", err));
+
+    fetch("/api/gruppen")
+      .then((res) => res.json())
+      .then((data) => {
+        data.forEach((gruppenIndex) => {
+          if (gruppenIndex.id == event.extendedProps.groupId) {
+            setGruppe(gruppenIndex);
+          }
+        });
+      })
+      .catch((err) => console.error("Fetch error:", err));
   }, []);
-  
+
   function addNewEvent() {
     setShowAddPopup(true);
   }
 
-  function writeNewEventToDB() {
-    
-  }
+  function writeNewEventToDB() {}
 
   return (
     <>
-          {showAddPopup && (
+      {showAddPopup && (
         <AddPopup
           onClose={() => setShowAddPopup(false)}
           event={null}
@@ -90,11 +112,8 @@ export default function Popup({
           >
             Trainer:
           </h4>
-          {event?.extendedProps?.trainer?.map(
-            (trainerName: string, index: number) => (
-              <p key={index}>{trainerName}</p>
-            ),
-          )}
+          <br></br>
+          {trainer ? `${trainer.vorname} ${trainer.nachname}` : "Laden..."}{" "}
         </div>
         <div style={{ float: "left", marginLeft: "5vw" }}>
           <h4
@@ -113,13 +132,11 @@ export default function Popup({
             Gruppe:
           </h4>
           <div>
-            {event?.extendedProps?.group?.map((g: { name: string, id: string }) => (
-              <p key={g.id}>
-                <a href={`/azubis/group/${g.id}`}>
-                  {g.name}
-                </a>
+            {gruppe && (
+              <p key={gruppe.id}>
+                <a href={`/azubis/group/${gruppe.id}`}>{gruppe.name}</a>
               </p>
-            ))}
+            )}
           </div>
         </div>
         <div>Raum: {event?.extendedProps?.raum}</div>
@@ -127,7 +144,11 @@ export default function Popup({
           Zeitspanne: {event?.startStr.split("T")[0]} -{" "}
           {event?.endStr.split("T")[0]}
         </div>
-        <Button sx={{marginTop: "400px"}} variant="outlined" onClick={()=>addNewEvent()}>
+        <Button
+          sx={{ marginTop: "400px" }}
+          variant="outlined"
+          onClick={() => addNewEvent()}
+        >
           Bearbeiten
         </Button>
       </Box>

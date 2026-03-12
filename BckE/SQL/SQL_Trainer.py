@@ -171,11 +171,7 @@ def main():
         #insert_sample(conn)
         #azubi = GFD.generate_azubi()
         #insert_Azubi(azubi)
-        Trainer = Trainer.Trainer()
-        Trainer.name = "Netanyahu"
-        Trainer.vorname = "Bibi"
-        Trainer.abwesenheiten = "9, 11"
-        insert_Trainer(Trainer)
+
         #add_absence(1, [str(2), str(3), str(4)])
         #change_absence(1, [str(3)])
 
@@ -187,5 +183,6 @@ def main():
 #if __name__ == "__main__":
 #main()
 #print(get_all_Trainers())
+
 
 create_table()

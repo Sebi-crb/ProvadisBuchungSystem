@@ -1,10 +1,10 @@
-import datetime
-
+from datetime import datetime
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 import BckE.formatting.dataGetter as dataGetter
 import BckE.writer.dataWriter as dataWriter
 import BckE.Logic.Manualbooking as Manualbooking
+import BckE.Logic.Editbooking as Editbooking
 app = Flask(__name__)
 CORS(app)
 
@@ -62,7 +62,7 @@ def get_allowed_modules(groupId):
     allowedModules = []
     for module in allModules:
         mId = allModules[module]['id']
-        if Manualbooking.check_modul_valid(groupId, mId):
+        if Manualbooking.check_modul_valid(None ,groupId, mId):
             allowedModules.append(module)
     return jsonify(allowedModules)
 
@@ -84,7 +84,7 @@ def getTrainerForSlot():
     print(data)
     start = data['start']
     modId = data['moduleId']
-    formatedStart = datetime.strptime(start, "%Y-%m-%d")
+    formatedStart = datetime.strptime(start, "%Y-%m-%d").date()
     slots = Manualbooking.get_available_trainers_for_slot(formatedStart, modId)
     return jsonify(slots)
 
@@ -95,28 +95,34 @@ def getRoomForSlot():
     print(data)
     start = data['start']
     modId = data['moduleId']
-    formatedStart = datetime.strptime(start, "%Y-%m-%d")
+    formatedStart = datetime.strptime(start, "%Y-%m-%d").date()
     slots = Manualbooking.get_available_rooms_for_slot(formatedStart, modId)
     return jsonify(slots)
 
 
 
 @app.route('/api/book_course', methods=['POST']) # a goat was here
-def book_course(
-    groupId: int,
-    modul_id: int,
-    start_date,
-    trainer_id: int,
-    room_id: int):
+def book_course():
+    data = request.json
+    groupId = data['groupId']
+    modul_id = data['moduleId']
+    start_date = data['start']
+    trainer_id = data['trainerId']
+    room_id = data['roomId']
+    formatedStart = datetime.strptime(start_date, "%Y-%m-%d").date()
     allGroups = dataGetter.get_Gruppen()
     groupObj = {}
     for group in allGroups:
         if group['id'] == groupId:
             groupObj = group
-    Manualbooking.book_manual_course(groupObj, modul_id, start_date, trainer_id, room_id)
+    Manualbooking.book_manual_course(groupObj, groupObj.get("id"), modul_id, formatedStart, trainer_id, room_id)
+    return "True"
 
 
-#def bookCourse():
+@app.route('/api/change_course_data', methods=['POST'])
+def change_course_data(courseID_):
+    all_available_slots_group_trainer_room = Editbooking.get_all_possible_slots(courseID_)
+
 
 
 

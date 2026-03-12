@@ -99,7 +99,7 @@ export default function AddPopup({
 
   return (
     <>
-    {showPopup2 &&( <AddPopup2 onClose={() => setShowPopup2(false)} slot={selectedSlot} mId={modul.id}/>)}
+    {showPopup2 &&( <AddPopup2 group={group} onClose={() => setShowPopup2(false)} slot={selectedSlot} mId={modul.id}/>)}
       <Box
         onClick={onClose}
         sx={{
@@ -133,12 +133,12 @@ export default function AddPopup({
         padding: "8px 14px",
         borderRadius: "6px",
         border: "1px solid #ccc",
-        background: "#f7f7f7",
+        background: "rgb(53, 111, 236)",
         cursor: "pointer",
       }}
       onClick={()=> openNextPopup(slot)}
     >
-      {slot.start} – {slot.end}
+      {slot.start} - {slot.end}
     </button>
   ))}
 </div>

@@ -214,7 +214,7 @@ def _cal_contains_full_slot(cal: dict, start_date: date, needed_weeks: int) -> b
 # SCHRITT 2: Modul-Validierung
 # ─────────────────────────────────────────────────────────────────────────────
 
-def check_modul_valid(group: dict, modul_id: int) -> bool:
+def check_modul_valid(group: dict, groupId: int, modul_id: int) -> bool:
     """
     Prüft ob das gewählte Modul für die Gruppe buchbar ist.
 
@@ -234,14 +234,15 @@ def check_modul_valid(group: dict, modul_id: int) -> bool:
 
     modul      = con_moduls[modul_id]
     modul_name = modul['name']
-    done   = _get_group_done_modules(group)
+    done   = _get_group_done_modules(groupId)
+    #print("done")
 
     # Bereits absolviert?
     if modul_id in done:
         return False
 
     # Lehrjahr
-    lehrjahr_ = SQL_Gruppe.get_Lehrjahr(group)
+    lehrjahr_ = SQL_Gruppe.get_Lehrjahr(groupId)
     gruppe_lj = _get_lernjahr_from_group_name(lehrjahr_)
     modul_lj  = _get_modul_lernjahr(modul)
     if gruppe_lj is None:
@@ -364,7 +365,7 @@ def get_available_trainers_for_slot(start_date: date, modul_id: int) -> list:
     modul        = con_moduls.get(modul_id, {})
     dauer        = int(modul.get('dauer', 5))
     needed_weeks = 1 if dauer <= 5 else 2
-
+    print(start_date)
     available = []
     for trainer in all_trainers:
         trainer_cal = _get_trainer_calendar(trainer['id'])
@@ -469,11 +470,12 @@ def check_room_valid(room_id: int, start_date: date, modul_id: int) -> dict:
 
 def book_manual_course(
     group: dict,
+    group_id: int,
     modul_id: int,
     start_date: date,
     trainer_id: int,
     room_id: int,
-) -> dict:
+):
     """
     Führt die manuelle Buchung durch – validiert alle Schritte nochmals
     bevor in die DB geschrieben wird (defensiv gegen Race Conditions).
@@ -495,14 +497,15 @@ def book_manual_course(
 
     # Alle Checks nochmal gebündelt
     checks = [
-        check_modul_valid(group, modul_id),
+        check_modul_valid(group, group_id, modul_id),
         check_slot_valid(group, modul_id, start_date),
         check_trainer_valid(trainer_id, start_date, modul_id),
         check_room_valid(room_id, start_date, modul_id),
     ]
     for chk in checks:
-        if not chk['ok']:
-            return chk  # gibt den ersten Fehler zurück
+        for bools in checks:
+            if(not bools):
+                return bools  # gibt den ersten Fehler zurück
 
     # Kurs anlegen
     kurs         = KursModell.Kurs()
@@ -521,10 +524,4 @@ def book_manual_course(
     day_keys = [k for k, v in base_cal.items() if start_date <= v <= end_date]
     SQL_Raum.add_absence(room_id, day_keys)
 
-    return {
-        "ok":     True,
-        "reason": (f"Kurs '{modul['name']}' erfolgreich gebucht: "
-                   f"{start_date} – {end_date}, "
-                   f"Trainer: {trainer['nachname']}, Raum: {raum['name']}"),
-        "warning": checks[0].get("warning", ""),   # optionale Vorgänger-Warnung
-    }
+    return True

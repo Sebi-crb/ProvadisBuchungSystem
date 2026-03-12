@@ -2,33 +2,29 @@ import { Autocomplete, Box, Button, TextField } from "@mui/material";
 import { useEffect, useState } from "react";
 import "react-datepicker/dist/react-datepicker.css";
 import "../css/addPopup.css";
-import PickRoom from "./pickRoom";
+import BookCours from "./BookCourse";
 
-export default function AddPopup2({
+export default function PickRoom({
   onClose,
   slot,
+  trainer,
   mId,
   group,
   onSend,
 }: {
   onClose: () => void;
   slot: any;
+  trainer: any;
   mId: any;
   group: any;
   onSend: (slot: any) => void;
 }) {
 
-    const [trainers, setTrainers] = useState([]);
-    const [selectedTrainer, setSelectedTrainer] = useState();
-    const [showNextPopup, setshowNextPopup] = useState(false);
-
-    function showNext(trainer){
-      setSelectedTrainer(trainer)
-      setshowNextPopup(true)
-    }
+    const [rooms, setRooms] = useState([]);
 
     useEffect(() => {
-    fetch("/api/getTrainerForSlot", {
+        console.log(trainer)
+    fetch("/api/getRoomForSlot", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ "start": slot.start, "moduleId": mId }),
@@ -39,21 +35,40 @@ export default function AddPopup2({
     })
     .then((data) => {
         console.log("Success:", data);
-        setTrainers(data)
+        setRooms(data)
     })
     .catch((error) => {
         console.error("Error:", error);
     });
 }, [])
+
+function bookCourse(room){
+        fetch("/api/book_course", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ "start": slot.start, "moduleId": mId, "roomId": room.id, "groupId": group.id, "trainerId": trainer.id }),
+    })
+    .then((res) => {
+        if (!res.ok) throw new Error("Network response was not ok");
+        return res.json(); 
+    })
+    .then((data) => {
+        console.log("Success:", data);
+        setRooms(data)
+    })
+    .catch((error) => {
+        console.error("Error:", error);
+    });
+    
+}
   
   return (
     <>
-    {showNextPopup && (<PickRoom group={group} slot={slot} trainer={selectedTrainer} onClose={onClose} mId={mId}/>)}
       <Box
         onClick={onClose}
         sx={{
           position: "fixed", top: 0, left: 0, right: 0, bottom: 0,
-          backgroundColor: "rgba(161, 161, 161, 0.5)", zIndex: 1503,
+          backgroundColor: "rgba(161, 161, 161, 0.5)", zIndex: 1600,
         }}
       />
       <Box
@@ -63,10 +78,10 @@ export default function AddPopup2({
           transform: "translate(-50%, -50%)",
           backgroundColor: "#f3f3f3", padding: 3, borderRadius: 2,
           boxShadow: "0 8px 32px rgba(0, 0, 0, 0.2)",
-          zIndex: 1504, maxWidth: "45vw", width: "90%", height: "60vh",
+          zIndex: 1601, maxWidth: "45vw", width: "90%", height: "60vh",
         }}
       >
-        <h2>Trainer wählen</h2>
+        <h2>Raum wählen</h2>
         <div
   style={{
     display: "flex",
@@ -75,7 +90,7 @@ export default function AddPopup2({
     marginTop: "12px",
   }}
 >
-          {trainers.map((trainer, index) => (
+          {rooms.map((room, index) => (
     <button
       key={index}
       style={{
@@ -85,9 +100,9 @@ export default function AddPopup2({
         background: "rgb(53, 111, 236)",
         cursor: "pointer",
       }}
-      onClick={()=> showNext(trainer)}
+      onClick={()=> {bookCourse(room)}}
     >
-      {trainer.vorname + " " + trainer.nachname} 
+      {room.name} 
     </button>
   ))}
   </div>

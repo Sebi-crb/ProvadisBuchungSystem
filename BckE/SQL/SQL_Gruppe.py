@@ -91,7 +91,7 @@ def get_Lehrjahr(id_):
         return row[0]
 
 
-print(get_Lehrjahr(1))
+#print(get_Lehrjahr(1))
 def add_attendedModules(id_, toAdd):
     with sqlite3.connect(DB) as conn:
         with sqlite3.connect(DB) as conn:
