@@ -91,10 +91,12 @@ def _parse_vorgaenger(raw_list: list) -> set:
     return result
 
 
-def _get_group_done_modules(group: dict) -> set:
+def _get_group_done_modules(group_id: int) -> set:
+    attended_modules_sql = SQL_Gruppe.get_attendedModules(group_id)
+    attended_modules_liste = [x.strip() for x in attended_modules_sql[0].split(',')]
     """Absolvierte Module einer Gruppe als int-Set."""
     done = set()
-    for m in group.get('attendedModules', []):
+    for m in attended_modules_liste:
         if str(m).strip().isdigit():
             done.add(int(m))
     return done
@@ -232,14 +234,15 @@ def check_modul_valid(group: dict, modul_id: int) -> bool:
 
     modul      = con_moduls[modul_id]
     modul_name = modul['name']
-    done       = _get_group_done_modules(group)
+    done   = _get_group_done_modules(group)
 
     # Bereits absolviert?
     if modul_id in done:
         return False
 
     # Lehrjahr
-    gruppe_lj = _get_lernjahr_from_group_name(group['name'])
+    lehrjahr_ = SQL_Gruppe.get_Lehrjahr(group)
+    gruppe_lj = _get_lernjahr_from_group_name(lehrjahr_)
     modul_lj  = _get_modul_lernjahr(modul)
     if gruppe_lj is None:
         return False

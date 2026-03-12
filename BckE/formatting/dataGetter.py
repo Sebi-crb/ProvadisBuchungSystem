@@ -95,7 +95,7 @@ def get_Gruppen():
     return formaed_dataArray
 
 def get_Modules():
-    data = BckE.SQL.config_Module_old.get_Modules()
+    data = BckE.SQL.config_Module.get_Modules()
     return data
 
 def get_Kurse():
@@ -114,4 +114,7 @@ def get_Kurse():
         }
         kurseArray.append(formated_dataObj)
     return kurseArray
+
+
+
 

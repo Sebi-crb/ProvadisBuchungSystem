@@ -2,7 +2,7 @@ from flask import Flask, jsonify, request
 from flask_cors import CORS
 import BckE.formatting.dataGetter as dataGetter
 import BckE.writer.dataWriter as dataWriter
-
+import BckE.Logic.Manualbooking as Manualbooking
 app = Flask(__name__)
 CORS(app)
 
@@ -54,6 +54,16 @@ def set_holidays():
     newAbsenceList = dataWriter.add_absence(start, end, trainerId)
     return jsonify(newAbsenceList)
 
-    return
+@app.route('/api/modules/<int:groupId>', methods=['GET'])
+def get_allowed_modules(groupId):
+    allModules = dataGetter.get_Modules()
+    allowedModules = []
+    for module in allModules:
+        mId = allModules[module]['id']
+        if Manualbooking.check_modul_valid(groupId, mId):
+            allowedModules.append(module)
+    print("gay")
+    return jsonify(allowedModules)
+
 if __name__ == '__main__':
     app.run(debug=True, port=5000)

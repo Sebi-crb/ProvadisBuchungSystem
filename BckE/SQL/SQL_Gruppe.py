@@ -3,6 +3,7 @@ from datetime import date
 from pathlib import Path
 
 from BckE.Modelle.Gruppe import Gruppe
+from BckE.writer.dataWriter import add_absence
 
 PROJECT_ROOT_NAME = "ProvadisBuchungSystem"
 TARGET_SUBPATH = Path("BckE") / "SQL" / "Main.db"   # gewünschter Pfad ab Projektwurzel
@@ -77,6 +78,53 @@ def drop_table():
         conn.commit()
         create_table(conn)
 
+def get_attendedModules(id_):
+    with sqlite3.connect(DB) as conn:
+        cur = conn.execute("SELECT AttendedModules FROM Gruppe WHERE id=?", (id_,))
+        row = cur.fetchone()
+        return row
+
+def get_Lehrjahr(id_):
+    with sqlite3.connect(DB) as conn:
+        cur = conn.execute("SELECT Name FROM Gruppe WHERE id=?", (id_,))
+        row = cur.fetchone()
+        return row[0]
+
+
+print(get_Lehrjahr(1))
+def add_attendedModules(id_, toAdd):
+    with sqlite3.connect(DB) as conn:
+        with sqlite3.connect(DB) as conn:
+            cur = conn.execute("SELECT AttendedModules FROM Gruppe WHERE id = ?", (id_,))
+            row = cur.fetchone()
+            if not row:
+                return
+
+            # Aktuelle Werte in Liste umwandeln
+            werte = row[0]  # z.B. "1, 3, 5"
+            liste = [x.strip() for x in werte.split(",") if x.strip()]
+
+            # Neue Werte hinzufügen (als Strings)
+            for w in toAdd:
+                w_str = str(w)
+                if w_str not in liste:
+                    liste.append(w_str)
+
+            # Sortieren optional (falls du die Reihenfolge sauber halten willst)
+            liste = sorted(liste, key=lambda x: int(x))
+
+            # Neue Zeichenkette erzeugen
+            neuer_text = ", ".join(liste)
+
+            # Update in DB schreiben
+            conn.execute(
+                "UPDATE Gruppe SET AttendedModules = ? WHERE id = ?",
+                (neuer_text, id_)
+            )
+
+            return neuer_text
+
+
 def add_absence(id_, toAdd):
     with sqlite3.connect(DB) as conn:
         cur = conn.execute("SELECT Abwesenheiten FROM Gruppe WHERE id = ?", (id_,))
@@ -107,6 +155,10 @@ def add_absence(id_, toAdd):
         )
 
         return neuer_text
+
+
+#add_attendedModules(1, [2, 5])
+#print(get_attendedModules(1))
 
 
 def main():

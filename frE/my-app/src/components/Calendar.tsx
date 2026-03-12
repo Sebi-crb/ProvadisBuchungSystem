@@ -18,12 +18,11 @@ export default function Calendar(props: { termine: any; gruppen: any }) {
   const [events, setEvents] = useState<EventSourceInput>(props.termine);
 
   useEffect(() => {
-    console.log(localStorage.getItem("role"));
     let finishedEvents: any = [];
     fetch("/api/kurs")
       .then((res) => res.json())
       .then((kurse) => {
-        console.log("data", kurse);
+        sessionStorage.setItem("kurse", JSON.stringify(kurse))
         for (const kurs of kurse) {
           const start = new Date(kurs?.startDate);
           start.setHours(8, 0, 0, 0);
@@ -46,9 +45,7 @@ export default function Calendar(props: { termine: any; gruppen: any }) {
 
           finishedEvents.push(formattedEvent);
         }
-        console.log("finishedEvents", finishedEvents);
         setEvents(finishedEvents);
-        console.log("events", events);
       });
   }, []);
 
@@ -62,7 +59,6 @@ export default function Calendar(props: { termine: any; gruppen: any }) {
     console.log("info", info);
     setSelectedEvent(info.event);
     setShowInfoPopup(true);
-    console.log(info.event.extendedProps);
   }
 
   function addNewEvent() {

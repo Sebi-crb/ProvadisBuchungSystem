@@ -15,22 +15,23 @@ export default function AddPopup({
 }) {
   const [startDate, setStartDate] = useState(new Date());
   const [endDate, setEndDate] = useState(startDate);
-  const [modul, setModul] = useState("");
+  const [modul, setModul] = useState<{ label: string; id: number } | null>(null);
   const [trainer, setTrainer] = useState<string[]>([]);
-  const [group, setGroup] = useState<string[]>([]);
+  const [group, setGroup] = useState<{ label: string; id: number }[]>([]);
 
-  const modules = [{ label: "Modul 1" }, { label: "Modul 2" }];
   const [trainerOptions, setTrainerOptions] = useState<{ label: string }[]>([]);
-  const [groupOptions, setGroupOptions] = useState<{ label: string; value: number }[]>([]);
+  const [groupOptions, setGroupOptions] = useState<{ label: string; id: number }[]>([]);
+  const [moduleOptions, setModuleOptions] = useState<{ label: string; id: number }[]>([]);
 
   function saveEvent() {
     const newEvent = {
-      title: modul,
+      title: modul?.label ?? "",
       start: startDate.setHours(8, 0, 0, 0),
       end: endDate.setHours(16, 30, 0, 0),
       extendedProps: {
+        modulId: modul?.id,
         trainer: trainer,
-        group: group,
+        group: group.map((g) => g.id),
       },
     };
     onSend(newEvent);
@@ -42,25 +43,37 @@ export default function AddPopup({
     fetch("/api/trainers")
       .then((response) => response.json())
       .then((data) => {
-        console.log("Rohdaten der Trainer:", data);
         const formattedTrainers = data.map((trainer: any) => ({
           label: trainer.vorname + " " + trainer.nachname,
         }));
-        console.log("Trainer Optionen:", formattedTrainers);
         setTrainerOptions(formattedTrainers);
       });
+      fetch("/api/modules/1")
+      .then((response) => response.json())
+      .then((data) => {
+        console.log("allowedModules", data)
+      });
 
-      fetch("/api/gruppen")
-        .then((response) => response.json())
-        .then((data) => {
-          console.log("Rohdaten der Gruppen:", data);
-          const formattedGroups = data.map((group: any) => ({
-            label: group.namen,
-            value: group.id,
-          }));
-          console.log("Gruppen Optionen:", formattedGroups);
-          setGroupOptions(formattedGroups);
-        });
+    fetch("/api/gruppen")
+      .then((response) => response.json())
+      .then((data) => {
+        const formattedGroups = data.map((group: any) => ({
+          label: group.name,
+          id: group.id,
+        }));
+        setGroupOptions(formattedGroups);
+      });
+
+    fetch("/api/modules")
+      .then((response) => response.json())
+      .then((data) => {
+        // API returns an object keyed by id, not an array — use Object.values()
+        const formattedModules = Object.values(data).map((m: any) => ({
+          label: m.name,
+          id: m.id,
+        }));
+        setModuleOptions(formattedModules);
+      });
   }, []);
 
   return (
@@ -74,7 +87,7 @@ export default function AddPopup({
           right: 0,
           bottom: 0,
           backgroundColor: "rgba(161, 161, 161, 0.5)",
-          zIndex: 1299,
+          zIndex: 1500,
         }}
       />
       <Box
@@ -88,7 +101,7 @@ export default function AddPopup({
           padding: 3,
           borderRadius: 2,
           boxShadow: "0 8px 32px rgba(0, 0, 0, 0.2)",
-          zIndex: 1300,
+          zIndex: 1501,
           maxWidth: "45vw",
           width: "90%",
           height: "60vh",
@@ -99,9 +112,7 @@ export default function AddPopup({
           <h4>Start</h4>
           <DatePicker
             selected={startDate}
-            onChange={(date: any) => {
-              setStartDate(date);
-            }}
+            onChange={(date: any) => setStartDate(date)}
             filterDate={(date) => date.getDay() !== 0 && date.getDay() !== 6}
           />
         </div>
@@ -117,10 +128,12 @@ export default function AddPopup({
         <div>
           <Autocomplete
             disablePortal
-            options={modules}
+            options={moduleOptions}
             sx={{ width: 300 }}
             renderInput={(params) => <TextField {...params} label="Modul" />}
-            onChange={(value: any) => setModul(value.target.innerText)}
+            onChange={(_, newValue) => {
+              setModul(newValue); // store full object so MUI can render the selected label
+            }}
           />
         </div>
         <div>
@@ -143,16 +156,14 @@ export default function AddPopup({
             sx={{ width: 300 }}
             renderInput={(params) => <TextField {...params} label="Group" />}
             onChange={(_, newValue) => {
-              setGroup(newValue.map((option) => option.value));
+              setGroup(newValue);
             }}
           />
         </div>
         <Button
           variant="contained"
           sx={{ backgroundColor: "#0C2F6F" }}
-          onClick={() => {
-            saveEvent();
-          }}
+          onClick={saveEvent}
         >
           Speichern
         </Button>

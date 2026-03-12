@@ -1,5 +1,8 @@
-import { Box } from "@mui/material";
+import { Box, Button } from "@mui/material";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import AddPopup from "./AddPopup";
+
 
 export default function Popup({
   onClose,
@@ -9,10 +12,38 @@ export default function Popup({
   event: any;
 }) {
   const navigate = useNavigate();
+  const formattedEventStructure = {
+    titel : event.title,
+    start : event.start,
+    end : event.end,
+    groupId : event.extendedProps.groupId
+}
+  const [showAddPopup, setShowAddPopup] = useState(false);
 
-  console.log("infopopup", event);
+  useEffect(() => {
+    let moduleId = event.extendedProps.moduleId
+    const kurse = JSON.parse(sessionStorage.getItem("kurse"))
+    let kursData = kurse[moduleId]  
+    console.log("kursDaten",kursData)
+  }, []);
+  
+  function addNewEvent() {
+    setShowAddPopup(true);
+  }
+
+  function writeNewEventToDB() {
+    
+  }
+
   return (
     <>
+          {showAddPopup && (
+        <AddPopup
+          onClose={() => setShowAddPopup(false)}
+          event={null}
+          onSend={writeNewEventToDB}
+        />
+      )}
       <Box
         onClick={onClose}
         sx={{
@@ -96,6 +127,9 @@ export default function Popup({
           Zeitspanne: {event?.startStr.split("T")[0]} -{" "}
           {event?.endStr.split("T")[0]}
         </div>
+        <Button sx={{marginTop: "400px"}} variant="outlined" onClick={()=>addNewEvent()}>
+          Bearbeiten
+        </Button>
       </Box>
     </>
   );
