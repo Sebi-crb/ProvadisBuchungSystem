@@ -10,30 +10,37 @@ import { useState } from "react";
 export default function TrainerCard({ name, id }: { name: string; id: string }) {
   const [showPopup, setShowPopup] = useState(false);
 
+  const isAdmin = sessionStorage.getItem("role") === "admin";
+
   return (
     <>
-        {showPopup && (
-      <AddHolidayPopup
-        onClose={() => setShowPopup(false)}
-        event={{ name, id }}
-      />
-        )}
+      {showPopup && (
+        <AddHolidayPopup
+          onClose={() => setShowPopup(false)}
+          event={{ name, id }}
+        />
+      )}
+
       <Card
         sx={{
           maxWidth: 345,
           width: "30vw",
           borderRadius: 4,
           boxShadow: "0px 4px 20px rgba(5, 4, 5, 0.5)",
-          cursor: "pointer",
+          cursor: isAdmin ? "pointer" : "default",
           transition: "transform 0.2s ease, box-shadow 0.2s ease",
-          "&:hover": {
-            transform: "translateY(-6px)",
-            boxShadow: "0px 10px 30px rgba(4, 4, 5, 0.5)",
+          "&:hover": isAdmin
+            ? {
+                transform: "translateY(-6px)",
+                boxShadow: "0px 10px 30px rgba(4, 4, 5, 0.5)",
+              }
+            : {},
+        }}
+        {...(isAdmin && {
+          onClick: () => {
+            setShowPopup(true);
           },
-        }}
-        onClick={() => {
-          setShowPopup(true);
-        }}
+        })}
       >
         <CardMedia
           component="div"
@@ -47,12 +54,14 @@ export default function TrainerCard({ name, id }: { name: string; id: string }) 
         >
           <UserIcon sx={{ fontSize: 60, color: "gray" }} />
         </CardMedia>
+
         <CardContent>
           <Typography gutterBottom variant="h5" component="div">
             {name}
           </Typography>
         </CardContent>
-        <CardActions></CardActions>
+
+        <CardActions />
       </Card>
     </>
   );

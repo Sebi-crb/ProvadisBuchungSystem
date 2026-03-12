@@ -69,6 +69,27 @@ export default function Calendar(props: { termine: any; gruppen: any }) {
     setShowAddPopup(true);
   }
 
+
+
+  const getCustomButtons = {
+    addEvent: {
+      text: "+",
+      click: () => addNewEvent(),
+      hint: "Neuen Kurs eintragen",
+    }
+  }
+
+
+  const isAdmin = sessionStorage.getItem("role") === "admin";
+
+  const headerToolbar = {
+  left: "prev,next today",
+  center: "title",
+  right: isAdmin
+    ? "addEvent timeGridDay,timeGridWeek,dayGridMonth"
+    : "timeGridDay,timeGridWeek,dayGridMonth",
+}
+
   return (
     <>
       {showInfoPopup && (
@@ -85,34 +106,20 @@ export default function Calendar(props: { termine: any; gruppen: any }) {
         />
       )}
       <Box sx={{ width: "70vw", float: "left", padding: 2 }}>
-        <FullCalendar
-          plugins={[timeGridPlugin, dayGridPlugin]}
-          initialView="dayGridMonth"
-          locale={deLocale}
-          weekends={false}
-          height="70vh"
-          headerToolbar={{
-            left: "prev,next today",
-            center: "title",
-            right: "addEvent timeGridDay,timeGridWeek,dayGridMonth",
-          }}
-          customButtons={{
-            addEvent: {
-              text: "+",
-              click: () => addNewEvent(),
-              hint: "Neuen Kurs eintragen",
-            },
-          }}
-          views={{
-            dayGridMonth: {
-              weekends: false,
-            },
-          }}
-          events={events}
-          eventClick={(info) => {
-            openEventDetails(info);
-          }}
-        />
+      <FullCalendar
+  plugins={[timeGridPlugin, dayGridPlugin]}
+  initialView="dayGridMonth"
+  locale={deLocale}
+  weekends={false}
+  height="70vh"
+  headerToolbar={headerToolbar}
+  {...(isAdmin && { customButtons: getCustomButtons })}
+  views={{
+    dayGridMonth: { weekends: false },
+  }}
+  events={events}
+  eventClick={(info) => openEventDetails(info)}
+/>
       </Box>
     </>
   );

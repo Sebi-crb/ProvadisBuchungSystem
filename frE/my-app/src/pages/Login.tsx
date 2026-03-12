@@ -12,10 +12,10 @@ export default function Login() {
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
     if (username === "user" && password === "user") {
-      localStorage.setItem("role", "user");
+      sessionStorage.setItem("role", "user");
       navigate("/home");
     } else if (username === "admin" && password === "admin") {
-      localStorage.setItem("role", "admin");
+      sessionStorage.setItem("role", "admin");
       navigate("/home");
     } else {
       alert("Ungültige Anmeldedaten");
