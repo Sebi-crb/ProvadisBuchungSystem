@@ -3,7 +3,7 @@ ManualBooking.py – Manuelle Kursbuchung mit schrittweiser Frontend-Validierung
 
 Ablauf (entspricht der Auswahl im Frontend):
   Schritt 1: Gruppe auswählen
-  Schritt 2: Modul auswählen      → check_modul_valid()
+  Schritt 2: Modul auswählen......→ check_modul_valid()
   Schritt 3: Zeitraum auswählen   → get_available_slots() / check_slot_valid()
   Schritt 4: Trainer auswählen    → get_available_trainers_for_slot() / check_trainer_valid()
   Schritt 5: Raum auswählen       → get_available_rooms_for_slot() / check_room_valid()
@@ -212,7 +212,7 @@ def _cal_contains_full_slot(cal: dict, start_date: date, needed_weeks: int) -> b
 # SCHRITT 2: Modul-Validierung
 # ─────────────────────────────────────────────────────────────────────────────
 
-def check_modul_valid(group: dict, modul_id: int) -> dict:
+def check_modul_valid(group: dict, modul_id: int) -> bool:
     """
     Prüft ob das gewählte Modul für die Gruppe buchbar ist.
 
@@ -228,7 +228,7 @@ def check_modul_valid(group: dict, modul_id: int) -> dict:
       'warning' ist gesetzt wenn optionale Vorgänger noch offen sind.
     """
     if modul_id not in con_moduls:
-        return {**_fail(f"Modul {modul_id} existiert nicht."), "warning": ""}
+        return False
 
     modul      = con_moduls[modul_id]
     modul_name = modul['name']
@@ -236,30 +236,22 @@ def check_modul_valid(group: dict, modul_id: int) -> dict:
 
     # Bereits absolviert?
     if modul_id in done:
-        return {**_fail(f"'{modul_name}' wurde von dieser Gruppe bereits absolviert."), "warning": ""}
+        return False
 
     # Lehrjahr
     gruppe_lj = _get_lernjahr_from_group_name(group['name'])
     modul_lj  = _get_modul_lernjahr(modul)
     if gruppe_lj is None:
-        return {**_fail("Lehrjahr der Gruppe konnte nicht ermittelt werden."), "warning": ""}
+        return False
     if modul_lj != gruppe_lj:
-        return {
-            **_fail(f"'{modul_name}' ist für Lehrjahr {modul_lj} vorgesehen, "
-                    f"die Gruppe ist im Lehrjahr {gruppe_lj}."),
-            "warning": ""
-        }
+        return False
 
     # Verpflichtende Vorgänger
     verpflichtend = _parse_vorgaenger(modul.get('verpflichtendeVorgängermodule', []))
     fehlende      = verpflichtend - done
     if fehlende:
         fehlende_namen = [con_moduls[fid]['name'] for fid in fehlende if fid in con_moduls]
-        return {
-            **_fail(f"Verpflichtende Vorgänger noch nicht absolviert: "
-                    f"{', '.join(fehlende_namen)}."),
-            "warning": ""
-        }
+        return False
 
     # Optionale Vorgänger (nur Warnung)
     optional = _parse_vorgaenger(modul.get('optionaleVorgängermodule', []))
@@ -269,7 +261,7 @@ def check_modul_valid(group: dict, modul_id: int) -> dict:
         warning = (f"Empfehlung: Die optionalen Vorgänger "
                    f"'{', '.join(opt_namen)}' sind noch nicht absolviert.")
 
-    return {**_ok(f"Modul '{modul_name}' ist buchbar."), "warning": warning}
+    return True
 
 
 # ─────────────────────────────────────────────────────────────────────────────
