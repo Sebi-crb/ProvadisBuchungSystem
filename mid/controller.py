@@ -116,7 +116,7 @@ def book_course(
     Manualbooking.book_manual_course(groupObj, modul_id, start_date, trainer_id, room_id)
 
 
-def bookCourse():
+#def bookCourse():
 
 
 
