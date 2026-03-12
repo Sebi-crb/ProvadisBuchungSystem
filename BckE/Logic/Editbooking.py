@@ -1,17 +1,18 @@
 """
-ManualBooking.py – Manuelle Kursbuchung mit schrittweiser Frontend-Validierung.
+EditBooking.py – Bestehende Kurse bearbeiten.
 
-Ablauf (entspricht der Auswahl im Frontend):
-  Schritt 1: Gruppe auswählen
-  Schritt 2: Modul auswählen      → check_modul_valid()
-  Schritt 3: Zeitraum auswählen   → get_available_slots() / check_slot_valid()
-  Schritt 4: Trainer auswählen    → get_available_trainers_for_slot() / check_trainer_valid()
-  Schritt 5: Raum auswählen       → get_available_rooms_for_slot() / check_room_valid()
-  Schritt 6: Buchen               → book_manual_course()
+Funktionen:
+  get_all_possible_slots()   → alle möglichen Termine für einen Kurs (Gruppe + Modul)
+  change_trainer()           → Trainer eines Kurses ersetzen
+  change_room()              → Raum eines Kurses ersetzen
+  change_timeframe()         → Zeitraum eines Kurses verschieben
+                               (verschiebt gleichzeitig Trainer + Raum)
 
-Jede check_*-Methode gibt ein Dict zurück:
-  { "ok": True/False, "reason": "..." }
-So kann das Frontend direkt den Grund einer Ablehnung anzeigen.
+Jede Änderungsfunktion:
+  1. Validiert die neue Auswahl
+  2. Gibt _fail() zurück wenn nicht möglich
+  3. Schreibt bei Erfolg in die DB und gibt _ok() zurück
+  4. Rollt den alten Slot im Kalender frei, bucht den neuen
 """
 
 from datetime import date, timedelta, datetime
@@ -25,18 +26,17 @@ import BckE.SQL.SQL_Gruppe as SQL_Gruppe
 import BckE.SQL.SQL_Raum as SQL_Raum
 import BckE.SQL.SQL_Kurs as SQL_Kurs
 import BckE.formatting.dataGetter as dataGetter
-import BckE.Modelle.Kurs as KursModell
 
 # ── Stammdaten ────────────────────────────────────────────────────────────────
 
-con_moduls = cModule.get_Modules()          # {id: modul_dict}
-all_groups = dataGetter.get_Gruppen()       # [{id, name, block, ...}]
-all_trainers = dataGetter.get_Trainers()    # [{id, nachname, vorname, ...}]
-all_rooms = dataGetter.get_Rooms()          # [{id, name, plätze, istPCRaum, ...}]
+con_moduls   = cModule.get_Modules()
+all_groups   = dataGetter.get_Gruppen()
+all_trainers = dataGetter.get_Trainers()
+all_rooms    = dataGetter.get_Rooms()
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# Interne Hilfsfunktionen (gemeinsam mit Setup.py)
+# Interne Hilfsfunktionen
 # ─────────────────────────────────────────────────────────────────────────────
 
 def _ok(reason: str = "") -> dict:
@@ -61,47 +61,20 @@ def _parse_absence_raw(raw) -> list:
     return sorted(result)
 
 
-def _get_lernjahr_from_group_name(group_name: str):
-    try:
-        start_year = 2000 + int(group_name[:2])
-        now = datetime.now()
-        schuljahr_start = now.year if now.month >= 8 else now.year - 1
-        lehrjahr = schuljahr_start - start_year + 1
-        return lehrjahr if 1 <= lehrjahr <= 3 else None
-    except (ValueError, IndexError):
-        return None
+def _get_trainer_calendar(trainer_id: int) -> dict:
+    raw      = SQL_Trainer.get_Trainer_absence(trainer_id)
+    absences = _parse_absence_raw(raw)
+    return trainer_calender.create_calendar_with_absence(absences)
 
 
-def _get_modul_lernjahr(modul: dict):
-    raw = modul.get('zuordnungLernjahr')
-    if isinstance(raw, str) and raw.strip().isdigit():
-        return int(raw.strip())
-    if isinstance(raw, int):
-        return raw
-    return None
-
-
-def _parse_vorgaenger(raw_list: list) -> set:
-    result = set()
-    for v in raw_list:
-        try:
-            result.add(int(v))
-        except (ValueError, TypeError):
-            pass
-    return result
-
-
-def _get_group_done_modules(group: dict) -> set:
-    """Absolvierte Module einer Gruppe als int-Set."""
-    done = set()
-    for m in group.get('attendedModules', []):
-        if str(m).strip().isdigit():
-            done.add(int(m))
-    return done
+def _get_room_calendar(room_id: int) -> dict:
+    raw      = SQL_Raum.get_room_absence(room_id)
+    absences = _parse_absence_raw(raw)
+    return raum_calendar.create_calendar_with_absence(absences)
 
 
 def _get_gruppe_calendar(block: str, gruppe_id: int) -> dict:
-    """Azubi-Kalender minus bereits gebuchte Tage."""
+    """Azubi-Kalender der Gruppe minus bereits gebuchte Tage."""
     gruppe_absence = []
     for row in SQL_Gruppe.get_all():
         if row[0] == gruppe_id and row[5]:
@@ -113,48 +86,71 @@ def _get_gruppe_calendar(block: str, gruppe_id: int) -> dict:
     return cal
 
 
-def _get_trainer_calendar(trainer_id: int) -> dict:
-    """Trainer-Kalender minus Abwesenheiten."""
-    raw = SQL_Trainer.get_Trainer_absence(trainer_id)
-    absences = _parse_absence_raw(raw)
-    return trainer_calender.create_calendar_with_absence(absences)
-
-
-def _get_room_calendar(room_id: int) -> dict:
-    """Raumkalender minus Abwesenheiten."""
-    raw = SQL_Raum.get_room_absence(room_id)
-    absences = _parse_absence_raw(raw)
-    return raum_calendar.create_calendar_with_absence(absences)
-
-
-def _get_group_booked_week_starts(gruppe_id: int, block: str) -> set:
+def _cal_contains_full_slot(cal: dict, start_date: date, needed_weeks: int) -> bool:
     """
-    Gibt alle Wochen-Startdaten (date) zurück, in denen die Gruppe
-    bereits einen Kurs hat. Wird für die 6-Wochen-Regel benötigt.
+    True wenn der Kalender alle Arbeitstage des Zeitraums (start_date +
+    needed_weeks Wochen Mo–Fr) enthält.
+    """
+    date_set = set(cal.values())
+    for w in range(needed_weeks):
+        week_monday = start_date + timedelta(days=7 * w)
+        for d in range(5):
+            if (week_monday + timedelta(days=d)) not in date_set:
+                return False
+    return True
+
+
+def _get_key_for_date(cal: dict, target_date: date):
+    """Gibt den Index-Schlüssel eines Datums im Kalender zurück."""
+    for key, val in cal.items():
+        if val == target_date:
+            return key
+    return None
+
+
+def _get_group_booked_week_starts(gruppe_id: int, block: str,
+                                   exclude_kurs_id: int = None) -> set:
+    """
+    Alle gebuchten Wochen-Startdaten einer Gruppe.
+    exclude_kurs_id: Den aktuell bearbeiteten Kurs herausrechnen,
+                     damit sein Zeitraum als 'frei' gilt.
     """
     booked_starts = set()
+
+    # Gebuchte Daten des auszuschließenden Kurses ermitteln
+    exclude_dates = set()
+    if exclude_kurs_id is not None:
+        kurs_row = SQL_Kurs.get_Kurs(exclude_kurs_id)
+        if kurs_row:
+            try:
+                ex_start = date.fromisoformat(str(kurs_row[3]))
+                ex_end   = date.fromisoformat(str(kurs_row[4]))
+                d = ex_start
+                while d <= ex_end:
+                    exclude_dates.add(d)
+                    d += timedelta(days=1)
+            except (ValueError, TypeError):
+                pass
+
     for row in SQL_Gruppe.get_all():
         if row[0] != gruppe_id or not row[5]:
             continue
         absence_indices = {int(x.strip()) for x in row[5].split(',') if x.strip()}
         all_cal = azubi_calendar.createCal()
         for idx, d in all_cal.items():
+            if d in exclude_dates:
+                continue
             end_d = all_cal.get(idx + 4)
             if end_d and (end_d - d).days == 4:
                 if any(i in absence_indices for i in range(idx, idx + 5)):
                     booked_starts.add(d)
+
     return booked_starts
 
 
 def _check_6week_rule(booked_starts: set, week_start: date, needed_weeks: int) -> dict:
-    """
-    Gibt _fail() zurück wenn die 6-Wochen-Regel verletzt wird, sonst _ok().
-    Regel: Nach 6 aufeinanderfolgenden Unterrichtswochen mindestens 2 Wochen Pause.
-    """
     for i in range(needed_weeks):
         w = week_start + timedelta(days=7 * i)
-
-        # Prüfe: Wäre w die 7. Woche in Folge?
         consecutive = 0
         prev = w - timedelta(days=7)
         while prev in booked_starts:
@@ -162,17 +158,14 @@ def _check_6week_rule(booked_starts: set, week_start: date, needed_weeks: int) -
             prev -= timedelta(days=7)
         if consecutive >= 6:
             return _fail(
-                f"6-Wochen-Regel verletzt: Die Woche ab {w} wäre die "
-                f"{consecutive + 1}. Woche in Folge (max. 6 erlaubt)."
+                f"6-Wochen-Regel: Woche ab {w} wäre die {consecutive + 1}. "
+                f"Woche in Folge (max. 6 erlaubt)."
             )
-
-        # Prüfe: Liegt w in einer erzwungenen Pause?
         for gap in [1, 2]:
             run_end = w - timedelta(days=7 * gap)
             if run_end not in booked_starts:
                 continue
-            run_len = 0
-            c = run_end
+            run_len, c = 0, run_end
             while c in booked_starts:
                 run_len += 1
                 c -= timedelta(days=7)
@@ -183,120 +176,112 @@ def _check_6week_rule(booked_starts: set, week_start: date, needed_weeks: int) -
                 )
                 if between_free:
                     return _fail(
-                        f"6-Wochen-Regel: Die Woche ab {w} liegt in der "
+                        f"6-Wochen-Regel: Woche ab {w} liegt in der "
                         f"Pflichtpause nach einem 6-Wochen-Block."
                     )
     return _ok()
 
 
-def _cal_contains_full_slot(cal: dict, start_date: date, needed_weeks: int) -> bool:
+def _free_slot_in_calendar(cal_module, free_func, entity_id: int,
+                            start_date: date, end_date: date):
     """
-    Prüft ob ein Kalender (Tag-Index → Datum) den gesamten Zeitraum
-    (start_date + needed_weeks Wochen) lückenfrei enthält.
+    Gibt die Tages-Indizes des gebuchten Zeitraums frei (entfernt sie aus
+    den Abwesenheiten). Wird beim Ändern von Trainer/Raum/Zeitraum verwendet.
     """
-    date_set = set(cal.values())
-    for i in range(needed_weeks * 5):  # 5 Arbeitstage pro Woche
-        check = start_date + timedelta(days=i + (i // 5) * 2)  # Mo–Fr überspringt Wochenende
-        # Einfachere Variante: alle Wochentage zwischen start und end prüfen
-    # Variante: Woche(n) als Montag-Startdaten prüfen
-    for w in range(needed_weeks):
-        week_start = start_date + timedelta(days=7 * w)
-        for d in range(5):  # Mo bis Fr
-            day = week_start + timedelta(days=d)
-            if day not in date_set:
-                return False
-    return True
+    base_cal = cal_module.createCal()
+    day_keys = [k for k, v in base_cal.items() if start_date <= v <= end_date]
+    free_func(entity_id, day_keys)
+
+
+def _get_lernjahr_from_group_name(group_name: str):
+    try:
+        start_year = 2000 + int(group_name[:2])
+        now = datetime.now()
+        schuljahr_start = now.year if now.month >= 8 else now.year - 1
+        lj = schuljahr_start - start_year + 1
+        return lj if 1 <= lj <= 3 else None
+    except (ValueError, IndexError):
+        return None
+
+
+def _resolve_kurs(kurs_id: int) -> tuple:
+    """
+    Gibt (kurs_row, group, modul, trainer, raum) zurück oder wirft ValueError.
+    kurs_row: DB-Zeile (id, Name, GruppenID, StartDate, EndDate, TrainerID, Raum, ModulID)
+    """
+    kurs_row = SQL_Kurs.get_Kurs(kurs_id)
+    if not kurs_row:
+        raise ValueError(f"Kurs {kurs_id} nicht gefunden.")
+
+    gruppe_id  = int(kurs_row[2])
+    trainer_id = int(kurs_row[5])
+    modul_id   = int(kurs_row[7])
+    raum_name  = kurs_row[6]
+
+    group   = next((g for g in all_groups   if g['id'] == gruppe_id),   None)
+    trainer = next((t for t in all_trainers if t['id'] == trainer_id),  None)
+    raum    = next((r for r in all_rooms    if r['name'] == raum_name),  None)
+    modul   = con_moduls.get(modul_id)
+
+    return kurs_row, group, modul, trainer, raum
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# SCHRITT 2: Modul-Validierung
+# ABFRAGE: Alle möglichen Termine für einen Kurs
 # ─────────────────────────────────────────────────────────────────────────────
 
-def check_modul_valid(group: dict, modul_id: int) -> dict:
+def get_all_possible_slots(kurs_id: int) -> list:
     """
-    Prüft ob das gewählte Modul für die Gruppe buchbar ist.
+    Gibt alle möglichen Zeiträume zurück, in denen der Kurs stattfinden könnte,
+    basierend auf der Gruppe (Block-Kalender, 6-Wochen-Regel) – unabhängig von
+    Trainer- und Raumverfügbarkeit.
 
-    Prüft:
-      - Existiert das Modul?
-      - Passt das Lehrjahr?
-      - Wurde es bereits absolviert?
-      - Sind alle verpflichtenden Vorgänger absolviert?
-      - (Info) Optionale Vorgänger noch offen?
+    Das erlaubt dem Frontend zunächst einen Überblick aller Optionen zu zeigen,
+    bevor Trainer und Raum gewählt werden.
 
-    Gibt zurück:
-      { "ok": True/False, "reason": str, "warning": str }
-      'warning' ist gesetzt wenn optionale Vorgänger noch offen sind.
-    """
-    if modul_id not in con_moduls:
-        return {**_fail(f"Modul {modul_id} existiert nicht."), "warning": ""}
-
-    modul      = con_moduls[modul_id]
-    modul_name = modul['name']
-    done       = _get_group_done_modules(group)
-
-    # Bereits absolviert?
-    if modul_id in done:
-        return {**_fail(f"'{modul_name}' wurde von dieser Gruppe bereits absolviert."), "warning": ""}
-
-    # Lehrjahr
-    gruppe_lj = _get_lernjahr_from_group_name(group['name'])
-    modul_lj  = _get_modul_lernjahr(modul)
-    if gruppe_lj is None:
-        return {**_fail("Lehrjahr der Gruppe konnte nicht ermittelt werden."), "warning": ""}
-    if modul_lj != gruppe_lj:
-        return {
-            **_fail(f"'{modul_name}' ist für Lehrjahr {modul_lj} vorgesehen, "
-                    f"die Gruppe ist im Lehrjahr {gruppe_lj}."),
-            "warning": ""
-        }
-
-    # Verpflichtende Vorgänger
-    verpflichtend = _parse_vorgaenger(modul.get('verpflichtendeVorgängermodule', []))
-    fehlende      = verpflichtend - done
-    if fehlende:
-        fehlende_namen = [con_moduls[fid]['name'] for fid in fehlende if fid in con_moduls]
-        return {
-            **_fail(f"Verpflichtende Vorgänger noch nicht absolviert: "
-                    f"{', '.join(fehlende_namen)}."),
-            "warning": ""
-        }
-
-    # Optionale Vorgänger (nur Warnung)
-    optional = _parse_vorgaenger(modul.get('optionaleVorgängermodule', []))
-    warning  = ""
-    if optional and not (optional & done):
-        opt_namen = [con_moduls[oid]['name'] for oid in optional if oid in con_moduls]
-        warning = (f"Empfehlung: Die optionalen Vorgänger "
-                   f"'{', '.join(opt_namen)}' sind noch nicht absolviert.")
-
-    return {**_ok(f"Modul '{modul_name}' ist buchbar."), "warning": warning}
-
-
-# ─────────────────────────────────────────────────────────────────────────────
-# SCHRITT 3: Zeitraum
-# ─────────────────────────────────────────────────────────────────────────────
-
-def get_available_slots(group: dict, modul_id: int) -> list:
-    """
-    Gibt alle verfügbaren Wochen-Slots zurück, in denen die Gruppe
-    frei ist (ohne Trainer/Raum-Prüfung – die folgt in Schritt 4/5).
-
-    Jeder Slot ist ein Dict:
+    Rückgabe: Liste von Dicts:
       {
-        "start": date,   # Montag der ersten Woche
-        "end":   date,   # Freitag der letzten Woche
-        "weeks": int     # 1 oder 2
+        "start":          date,     # Montag der ersten Woche
+        "end":            date,     # Freitag der letzten Woche
+        "weeks":          int,      # 1 oder 2
+        "trainers_free":  list,     # Trainer die in diesem Slot frei sind
+        "rooms_free":     list,     # passende Räume die frei sind
+        "fully_bookable": bool      # True wenn mindestens 1 Trainer + 1 Raum frei
       }
     """
-    modul        = con_moduls[modul_id]
-    dauer        = int(modul['dauer'])
-    needed_weeks = 1 if dauer <= 5 else 2
-    block        = group['block']
-    gruppe_id    = group['id']
+    try:
+        kurs_row, group, modul, current_trainer, current_raum = _resolve_kurs(kurs_id)
+    except ValueError as e:
+        return []
 
-    gruppe_cal      = _get_gruppe_calendar(block, gruppe_id)
-    gruppe_weeks    = azubi_calendar.get_available_weeks(gruppe_cal)
-    booked_starts   = _get_group_booked_week_starts(gruppe_id, block)
+    start_date_old = date.fromisoformat(str(kurs_row[3]))
+    end_date_old   = date.fromisoformat(str(kurs_row[4]))
+    dauer          = int(modul['dauer'])
+    needed_weeks   = 1 if dauer <= 5 else 2
+    modul_pc       = modul['pcKennzeichnung']
+    block          = group['block']
+    gruppe_id      = group['id']
+
+    # Gruppe-Kalender: aktuellen Kurs als frei behandeln
+    gruppe_absence_raw = []
+    for row in SQL_Gruppe.get_all():
+        if row[0] == gruppe_id and row[5]:
+            gruppe_absence_raw = [int(x.strip()) for x in row[5].split(',') if x.strip()]
+            break
+
+    base_cal = azubi_calendar.createCal()
+    # Indizes des aktuellen Kurses ermitteln und temporär freigeben
+    old_indices = {k for k, v in base_cal.items()
+                   if start_date_old <= v <= end_date_old}
+    freie_absence = [i for i in gruppe_absence_raw if i not in old_indices]
+
+    temp_cal = azubi_calendar.createAzubiCal(block)
+    for idx in freie_absence:
+        temp_cal.pop(idx, None)
+
+    gruppe_weeks  = azubi_calendar.get_available_weeks(temp_cal)
+    booked_starts = _get_group_booked_week_starts(gruppe_id, block,
+                                                   exclude_kurs_id=kurs_id)
 
     slots = []
     for i, w in enumerate(gruppe_weeks):
@@ -312,224 +297,370 @@ def get_available_slots(group: dict, modul_id: int) -> list:
         else:
             end = w['end']['endDate']
 
-        # 6-Wochen-Regel prüfen
+        # 6-Wochen-Regel
         if not _check_6week_rule(booked_starts, start, needed_weeks)['ok']:
             continue
 
+        # Welche Trainer sind frei?
+        trainers_free = []
+        for t in all_trainers:
+            t_cal = _get_trainer_calendar(t['id'])
+            # Alten Slot temporär freigeben
+            old_t_indices = {k for k, v in trainer_calender.createCal().items()
+                             if start_date_old <= v <= end_date_old}
+            for idx in old_t_indices:
+                if t['id'] == (current_trainer['id'] if current_trainer else -1):
+                    t_cal[idx] = trainer_calender.createCal().get(idx)
+            if _cal_contains_full_slot(t_cal, start, needed_weeks):
+                trainers_free.append({"id": t['id'], "name": t['nachname']})
+
+        # Welche Räume sind frei und haben passende PC-Kennzeichnung?
+        rooms_free = []
+        for r in all_rooms:
+            raum_pc = str(r['istPCRaum']).strip() == '1'
+            if modul_pc != raum_pc:
+                continue
+            r_cal = _get_room_calendar(r['id'])
+            # Alten Slot freigeben wenn es der aktuelle Raum ist
+            if current_raum and r['id'] == current_raum['id']:
+                old_r_base = raum_calendar.createCal()
+                for idx in {k for k, v in old_r_base.items()
+                            if start_date_old <= v <= end_date_old}:
+                    r_cal[idx] = old_r_base.get(idx)
+            if _cal_contains_full_slot(r_cal, start, needed_weeks):
+                rooms_free.append({"id": r['id'], "name": r['name']})
+
         slots.append({
-            "start": start,
-            "end":   end,
-            "weeks": needed_weeks,
+            "start":          start,
+            "end":            end,
+            "weeks":          needed_weeks,
+            "trainers_free":  trainers_free,
+            "rooms_free":     rooms_free,
+            "fully_bookable": bool(trainers_free and rooms_free),
         })
 
     return slots
 
 
-def check_slot_valid(group: dict, modul_id: int, start_date: date) -> dict:
+# ─────────────────────────────────────────────────────────────────────────────
+# ÄNDERUNG: Trainer wechseln
+# ─────────────────────────────────────────────────────────────────────────────
+
+def change_trainer(kurs_id: int, new_trainer_id: int) -> dict:
     """
-    Prüft ob der vom User gewählte Startzeitpunkt für Gruppe + Modul gültig ist.
+    Ersetzt den Trainer eines bestehenden Kurses.
 
     Prüft:
-      - Ist der Slot in der Gruppe frei?
-      - Wird die 6-Wochen-Regel eingehalten?
+      - Existiert der neue Trainer?
+      - Ist er im Zeitraum des Kurses verfügbar?
+
+    Aktualisiert Trainer-Abwesenheiten in der DB (alt frei, neu belegt).
     """
-    modul        = con_moduls.get(modul_id)
-    if not modul:
-        return _fail(f"Modul {modul_id} nicht gefunden.")
+    try:
+        kurs_row, group, modul, old_trainer, raum = _resolve_kurs(kurs_id)
+    except ValueError as e:
+        return _fail(str(e))
 
-    dauer        = int(modul['dauer'])
+    new_trainer = next((t for t in all_trainers if t['id'] == new_trainer_id), None)
+    if not new_trainer:
+        return _fail(f"Trainer mit ID {new_trainer_id} nicht gefunden.")
+
+    if old_trainer and new_trainer_id == old_trainer['id']:
+        return _fail("Das ist bereits der aktuelle Trainer.")
+
+    start_date = date.fromisoformat(str(kurs_row[3]))
+    end_date   = date.fromisoformat(str(kurs_row[4]))
+    dauer      = int(modul['dauer'])
     needed_weeks = 1 if dauer <= 5 else 2
-    block        = group['block']
-    gruppe_id    = group['id']
 
-    gruppe_cal   = _get_gruppe_calendar(block, gruppe_id)
-    booked_starts = _get_group_booked_week_starts(gruppe_id, block)
-
-    # Gruppe frei im gewählten Zeitraum?
-    if not _cal_contains_full_slot(gruppe_cal, start_date, needed_weeks):
+    # Neuen Trainer-Kalender prüfen (ohne seinen alten Kurs falls gleicher Trainer)
+    new_t_cal = _get_trainer_calendar(new_trainer_id)
+    if not _cal_contains_full_slot(new_t_cal, start_date, needed_weeks):
         return _fail(
-            f"Die Gruppe hat im Zeitraum ab {start_date} bereits einen Kurs "
-            f"oder ist in der Schule."
+            f"Trainer {new_trainer['nachname']} ist im Zeitraum "
+            f"{start_date} – {end_date} nicht verfügbar."
         )
 
-    # 6-Wochen-Regel
-    return _check_6week_rule(booked_starts, start_date, needed_weeks)
+    # DB aktualisieren: alten Trainer-Slot freigeben
+    if old_trainer:
+        base_cal = trainer_calender.createCal()
+        old_keys = [k for k, v in base_cal.items() if start_date <= v <= end_date]
+        trainer_calender.remove_absence(old_keys,
+            _get_trainer_calendar(old_trainer['id']))
+        SQL_Trainer.change_absence(old_trainer['id'], old_keys)
 
+    # Neuen Trainer blockieren
+    SQL_Trainer.add_absence(new_trainer_id,
+        [k for k, v in trainer_calender.createCal().items()
+         if start_date <= v <= end_date])
 
-# ─────────────────────────────────────────────────────────────────────────────
-# SCHRITT 4: Trainer
-# ─────────────────────────────────────────────────────────────────────────────
-
-def get_available_trainers_for_slot(start_date: date, modul_id: int) -> list:
-    """
-    Gibt alle Trainer zurück, die im gewählten Zeitraum verfügbar sind.
-
-    Rückgabe: Liste von Trainer-Dicts (id, nachname, vorname)
-    """
-    modul        = con_moduls.get(modul_id, {})
-    dauer        = int(modul.get('dauer', 5))
-    needed_weeks = 1 if dauer <= 5 else 2
-
-    available = []
-    for trainer in all_trainers:
-        trainer_cal = _get_trainer_calendar(trainer['id'])
-        if _cal_contains_full_slot(trainer_cal, start_date, needed_weeks):
-            available.append(trainer)
-
-    return available
-
-
-def check_trainer_valid(trainer_id: int, start_date: date, modul_id: int) -> dict:
-    """
-    Prüft ob der gewählte Trainer im gewählten Zeitraum verfügbar ist.
-    """
-    modul        = con_moduls.get(modul_id)
-    if not modul:
-        return _fail(f"Modul {modul_id} nicht gefunden.")
-
-    dauer        = int(modul['dauer'])
-    needed_weeks = 1 if dauer <= 5 else 2
-
-    trainer = next((t for t in all_trainers if t['id'] == trainer_id), None)
-    if not trainer:
-        return _fail(f"Trainer mit ID {trainer_id} nicht gefunden.")
-
-    trainer_cal = _get_trainer_calendar(trainer_id)
-    if not _cal_contains_full_slot(trainer_cal, start_date, needed_weeks):
-        return _fail(
-            f"Trainer {trainer['nachname']} ist im Zeitraum ab {start_date} "
-            f"nicht verfügbar (Abwesenheit oder anderer Kurs)."
+    # Kurs-Eintrag aktualisieren
+    import sqlite3
+    from pathlib import Path
+    proj_root = next(
+        (p for p in Path(__file__).resolve().parents
+         if p.name == "ProvadisBuchungSystem"), None
+    )
+    db_path = str(proj_root / "BckE" / "SQL" / "WIP2.db")
+    with sqlite3.connect(db_path) as conn:
+        conn.execute(
+            "UPDATE Kurse SET TrainerID = ? WHERE id = ?",
+            (new_trainer_id, kurs_id)
         )
 
-    return _ok(f"Trainer {trainer['nachname']} ist verfügbar.")
+    return _ok(
+        f"Trainer erfolgreich geändert: "
+        f"{old_trainer['nachname'] if old_trainer else '?'} → "
+        f"{new_trainer['nachname']} "
+        f"(Kurs '{kurs_row[1]}', {start_date} – {end_date})"
+    )
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# SCHRITT 5: Raum
+# ÄNDERUNG: Raum wechseln
 # ─────────────────────────────────────────────────────────────────────────────
 
-def get_available_rooms_for_slot(start_date: date, modul_id: int) -> list:
+def change_room(kurs_id: int, new_room_id: int) -> dict:
     """
-    Gibt alle Räume zurück, die im gewählten Zeitraum frei sind
-    und zur PC-Kennzeichnung des Moduls passen.
+    Ersetzt den Raum eines bestehenden Kurses.
 
-    Rückgabe: Liste von Raum-Dicts (id, name, plätze, istPCRaum)
+    Prüft:
+      - Existiert der Raum?
+      - Passt die PC-Kennzeichnung zum Modul?
+      - Ist der Raum im Zeitraum frei?
+
+    Aktualisiert Raum-Abwesenheiten in der DB.
     """
-    modul        = con_moduls.get(modul_id, {})
-    dauer        = int(modul.get('dauer', 5))
-    needed_weeks = 1 if dauer <= 5 else 2
-    modul_pc     = modul.get('pcKennzeichnung', False)
+    try:
+        kurs_row, group, modul, trainer, old_raum = _resolve_kurs(kurs_id)
+    except ValueError as e:
+        return _fail(str(e))
 
-    available = []
-    for raum in all_rooms:
-        raum_pc = str(raum['istPCRaum']).strip() == '1'
-        if modul_pc != raum_pc:
-            continue
-        room_cal = _get_room_calendar(raum['id'])
-        if _cal_contains_full_slot(room_cal, start_date, needed_weeks):
-            available.append(raum)
+    new_raum = next((r for r in all_rooms if r['id'] == new_room_id), None)
+    if not new_raum:
+        return _fail(f"Raum mit ID {new_room_id} nicht gefunden.")
 
-    return available
+    if old_raum and new_room_id == old_raum['id']:
+        return _fail("Das ist bereits der aktuelle Raum.")
 
-
-def check_room_valid(room_id: int, start_date: date, modul_id: int) -> dict:
-    """
-    Prüft ob der gewählte Raum im Zeitraum frei ist und zur
-    PC-Kennzeichnung des Moduls passt.
-    """
-    modul = con_moduls.get(modul_id)
-    if not modul:
-        return _fail(f"Modul {modul_id} nicht gefunden.")
-
-    raum = next((r for r in all_rooms if r['id'] == room_id), None)
-    if not raum:
-        return _fail(f"Raum mit ID {room_id} nicht gefunden.")
-
-    dauer        = int(modul['dauer'])
-    needed_weeks = 1 if dauer <= 5 else 2
-    modul_pc     = modul['pcKennzeichnung']
-    raum_pc      = str(raum['istPCRaum']).strip() == '1'
-
-    # PC-Kennzeichnung
+    modul_pc = modul['pcKennzeichnung']
+    raum_pc  = str(new_raum['istPCRaum']).strip() == '1'
     if modul_pc != raum_pc:
         benötigt = "PC-Raum" if modul_pc else "normalen Raum"
         return _fail(
             f"Modul '{modul['name']}' benötigt einen {benötigt}, "
-            f"'{raum['name']}' erfüllt diese Anforderung nicht."
+            f"'{new_raum['name']}' passt nicht."
         )
 
-    # Raum frei?
-    room_cal = _get_room_calendar(room_id)
-    if not _cal_contains_full_slot(room_cal, start_date, needed_weeks):
-        return _fail(
-            f"Raum '{raum['name']}' ist im Zeitraum ab {start_date} bereits belegt."
-        )
-
-    return _ok(f"Raum '{raum['name']}' ist verfügbar.")
-
-
-# ─────────────────────────────────────────────────────────────────────────────
-# SCHRITT 6: Kurs buchen
-# ─────────────────────────────────────────────────────────────────────────────
-
-def book_manual_course(
-    group: dict,
-    modul_id: int,
-    start_date: date,
-    trainer_id: int,
-    room_id: int,
-) -> dict:
-    """
-    Führt die manuelle Buchung durch – validiert alle Schritte nochmals
-    bevor in die DB geschrieben wird (defensiv gegen Race Conditions).
-
-    Rückgabe:
-      { "ok": True, "kurs_id": int, "reason": str }
-      { "ok": False, "reason": str }
-    """
-    modul = con_moduls.get(modul_id)
-    if not modul:
-        return _fail(f"Modul {modul_id} nicht gefunden.")
-
+    start_date   = date.fromisoformat(str(kurs_row[3]))
+    end_date     = date.fromisoformat(str(kurs_row[4]))
     dauer        = int(modul['dauer'])
     needed_weeks = 1 if dauer <= 5 else 2
-    end_date     = start_date + timedelta(days=needed_weeks * 7 - 3)  # letzter Freitag
 
-    trainer = next((t for t in all_trainers if t['id'] == trainer_id), None)
-    raum    = next((r for r in all_rooms    if r['id'] == room_id),    None)
+    new_room_cal = _get_room_calendar(new_room_id)
+    if not _cal_contains_full_slot(new_room_cal, start_date, needed_weeks):
+        return _fail(
+            f"Raum '{new_raum['name']}' ist im Zeitraum "
+            f"{start_date} – {end_date} bereits belegt."
+        )
 
-    # Alle Checks nochmal gebündelt
-    checks = [
-        check_modul_valid(group, modul_id),
-        check_slot_valid(group, modul_id, start_date),
-        check_trainer_valid(trainer_id, start_date, modul_id),
-        check_room_valid(room_id, start_date, modul_id),
-    ]
-    for chk in checks:
-        if not chk['ok']:
-            return chk  # gibt den ersten Fehler zurück
+    # DB: alten Raum freigeben
+    if old_raum:
+        base_cal = raum_calendar.createCal()
+        old_keys = [k for k, v in base_cal.items() if start_date <= v <= end_date]
+        SQL_Raum.change_absence(old_raum['id'], old_keys)
 
-    # Kurs anlegen
-    kurs         = KursModell.Kurs()
-    kurs.name    = modul['name']
-    kurs.modul   = modul_id
-    kurs.trainer = trainer
-    kurs.gruppe  = group
-    kurs.start   = start_date
-    kurs.end     = end_date
-    kurs.raum    = raum['name']
+    # Neuen Raum blockieren
+    SQL_Raum.add_absence(new_room_id,
+        [k for k, v in raum_calendar.createCal().items()
+         if start_date <= v <= end_date])
 
-    SQL_Kurs.insert_Kurs(kurs)
+    # Kurs-Eintrag aktualisieren
+    import sqlite3
+    from pathlib import Path
+    proj_root = next(
+        (p for p in Path(__file__).resolve().parents
+         if p.name == "ProvadisBuchungSystem"), None
+    )
+    db_path = str(proj_root / "BckE" / "SQL" / "WIP2.db")
+    with sqlite3.connect(db_path) as conn:
+        conn.execute(
+            "UPDATE Kurse SET Raum = ? WHERE id = ?",
+            (new_raum['name'], kurs_id)
+        )
 
-    # Raum-Kalender in DB aktualisieren
-    base_cal = raum_calendar.createCal()
-    day_keys = [k for k, v in base_cal.items() if start_date <= v <= end_date]
-    SQL_Raum.add_absence(room_id, day_keys)
+    return _ok(
+        f"Raum erfolgreich geändert: "
+        f"{old_raum['name'] if old_raum else '?'} → {new_raum['name']} "
+        f"(Kurs '{kurs_row[1]}', {start_date} – {end_date})"
+    )
 
-    return {
-        "ok":     True,
-        "reason": (f"Kurs '{modul['name']}' erfolgreich gebucht: "
-                   f"{start_date} – {end_date}, "
-                   f"Trainer: {trainer['nachname']}, Raum: {raum['name']}"),
-        "warning": checks[0].get("warning", ""),   # optionale Vorgänger-Warnung
-    }
+
+# ─────────────────────────────────────────────────────────────────────────────
+# ÄNDERUNG: Zeitraum verschieben
+# ─────────────────────────────────────────────────────────────────────────────
+
+def change_timeframe(kurs_id: int,
+                     new_start: date,
+                     new_trainer_id: int = None,
+                     new_room_id: int = None) -> dict:
+    """
+    Verschiebt einen bestehenden Kurs auf einen neuen Zeitraum.
+    Trainer und Raum können optional gleichzeitig gewechselt werden,
+    bleiben sonst dieselben (werden dann für den neuen Slot geprüft).
+
+    Prüft:
+      - Gruppe im neuen Zeitraum frei? (6-Wochen-Regel inklusive)
+      - Trainer im neuen Zeitraum verfügbar?
+      - Raum im neuen Zeitraum frei + passende PC-Kennzeichnung?
+
+    Aktualisiert alle Kalender (Gruppe, Trainer, Raum) in der DB.
+    """
+    try:
+        kurs_row, group, modul, old_trainer, old_raum = _resolve_kurs(kurs_id)
+    except ValueError as e:
+        return _fail(str(e))
+
+    old_start    = date.fromisoformat(str(kurs_row[3]))
+    old_end      = date.fromisoformat(str(kurs_row[4]))
+    dauer        = int(modul['dauer'])
+    needed_weeks = 1 if dauer <= 5 else 2
+    modul_pc     = modul['pcKennzeichnung']
+    new_end      = new_start + timedelta(days=needed_weeks * 7 - 3)
+
+    # Trainer und Raum: falls nicht angegeben, alte übernehmen
+    eff_trainer_id = new_trainer_id if new_trainer_id is not None else (
+        old_trainer['id'] if old_trainer else None)
+    eff_room_id    = new_room_id if new_room_id is not None else (
+        old_raum['id'] if old_raum else None)
+
+    eff_trainer = next((t for t in all_trainers if t['id'] == eff_trainer_id), None)
+    eff_raum    = next((r for r in all_rooms    if r['id'] == eff_room_id),    None)
+
+    if not eff_trainer:
+        return _fail(f"Trainer mit ID {eff_trainer_id} nicht gefunden.")
+    if not eff_raum:
+        return _fail(f"Raum mit ID {eff_room_id} nicht gefunden.")
+
+    # ── Gruppe prüfen ────────────────────────────────────────────────────────
+    # Alten Kurs aus Abwesenheiten herausrechnen
+    gruppe_absence_raw = []
+    gruppe_id = group['id']
+    for row in SQL_Gruppe.get_all():
+        if row[0] == gruppe_id and row[5]:
+            gruppe_absence_raw = [int(x.strip()) for x in row[5].split(',') if x.strip()]
+            break
+
+    base_cal   = azubi_calendar.createCal()
+    old_g_keys = {k for k, v in base_cal.items() if old_start <= v <= old_end}
+    temp_absence = [i for i in gruppe_absence_raw if i not in old_g_keys]
+
+    temp_cal = azubi_calendar.createAzubiCal(group['block'])
+    for idx in temp_absence:
+        temp_cal.pop(idx, None)
+
+    if not _cal_contains_full_slot(temp_cal, new_start, needed_weeks):
+        return _fail(
+            f"Gruppe '{group['name']}' hat im neuen Zeitraum "
+            f"{new_start} – {new_end} bereits einen anderen Kurs."
+        )
+
+    booked_starts = _get_group_booked_week_starts(gruppe_id, group['block'],
+                                                   exclude_kurs_id=kurs_id)
+    rule_check = _check_6week_rule(booked_starts, new_start, needed_weeks)
+    if not rule_check['ok']:
+        return rule_check
+
+    # ── Trainer prüfen ───────────────────────────────────────────────────────
+    t_cal    = _get_trainer_calendar(eff_trainer_id)
+    t_base   = trainer_calender.createCal()
+    # Alten Slot des (evtl. selben) Trainers freigeben
+    if old_trainer and eff_trainer_id == old_trainer['id']:
+        for k, v in t_base.items():
+            if old_start <= v <= old_end:
+                t_cal[k] = v
+
+    if not _cal_contains_full_slot(t_cal, new_start, needed_weeks):
+        return _fail(
+            f"Trainer {eff_trainer['nachname']} ist im neuen Zeitraum "
+            f"{new_start} – {new_end} nicht verfügbar."
+        )
+
+    # ── Raum prüfen ──────────────────────────────────────────────────────────
+    raum_pc = str(eff_raum['istPCRaum']).strip() == '1'
+    if modul_pc != raum_pc:
+        benötigt = "PC-Raum" if modul_pc else "normalen Raum"
+        return _fail(
+            f"Modul '{modul['name']}' benötigt einen {benötigt}, "
+            f"'{eff_raum['name']}' passt nicht."
+        )
+
+    r_cal  = _get_room_calendar(eff_room_id)
+    r_base = raum_calendar.createCal()
+    if old_raum and eff_room_id == old_raum['id']:
+        for k, v in r_base.items():
+            if old_start <= v <= old_end:
+                r_cal[k] = v
+
+    if not _cal_contains_full_slot(r_cal, new_start, needed_weeks):
+        return _fail(
+            f"Raum '{eff_raum['name']}' ist im neuen Zeitraum "
+            f"{new_start} – {new_end} bereits belegt."
+        )
+
+    # ── DB aktualisieren ─────────────────────────────────────────────────────
+
+    # 1) Alte Kalendereinträge freigeben
+    g_old_keys = [k for k, v in base_cal.items() if old_start <= v <= old_end]
+    SQL_Gruppe.change_absence(gruppe_id, g_old_keys)   # alte Abwesenheiten entfernen
+
+    if old_trainer:
+        t_old_keys = [k for k, v in t_base.items() if old_start <= v <= old_end]
+        SQL_Trainer.change_absence(old_trainer['id'], t_old_keys)
+
+    if old_raum:
+        r_old_keys = [k for k, v in r_base.items() if old_start <= v <= old_end]
+        SQL_Raum.change_absence(old_raum['id'], r_old_keys)
+
+    # 2) Neue Kalendereinträge setzen
+    g_new_keys = [k for k, v in base_cal.items() if new_start <= v <= new_end]
+    SQL_Gruppe.add_absence(gruppe_id, g_new_keys)
+
+    t_new_keys = [k for k, v in t_base.items() if new_start <= v <= new_end]
+    SQL_Trainer.add_absence(eff_trainer_id, t_new_keys)
+
+    r_new_keys = [k for k, v in r_base.items() if new_start <= v <= new_end]
+    SQL_Raum.add_absence(eff_room_id, r_new_keys)
+
+    # 3) Kurs-Eintrag in DB aktualisieren
+    SQL_Kurs.update_course_dates(kurs_id, new_start, new_end)
+
+    import sqlite3
+    from pathlib import Path
+    proj_root = next(
+        (p for p in Path(__file__).resolve().parents
+         if p.name == "ProvadisBuchungSystem"), None
+    )
+    db_path = str(proj_root / "BckE" / "SQL" / "WIP2.db")
+    with sqlite3.connect(db_path) as conn:
+        conn.execute(
+            "UPDATE Kurse SET TrainerID = ?, Raum = ? WHERE id = ?",
+            (eff_trainer_id, eff_raum['name'], kurs_id)
+        )
+
+    trainer_info = (
+        f"Trainer: {old_trainer['nachname']} → {eff_trainer['nachname']}"
+        if old_trainer and eff_trainer_id != old_trainer['id']
+        else f"Trainer: {eff_trainer['nachname']} (unverändert)"
+    )
+    raum_info = (
+        f"Raum: {old_raum['name']} → {eff_raum['name']}"
+        if old_raum and eff_room_id != old_raum['id']
+        else f"Raum: {eff_raum['name']} (unverändert)"
+    )
+
+    return _ok(
+        f"Kurs '{kurs_row[1]}' erfolgreich verschoben: "
+        f"{old_start} – {old_end} → {new_start} – {new_end}. "
+        f"{trainer_info}. {raum_info}."
+    )
