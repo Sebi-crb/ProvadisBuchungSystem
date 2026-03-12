@@ -88,5 +88,37 @@ def getTrainerForSlot():
     slots = Manualbooking.get_available_trainers_for_slot(formatedStart, modId)
     return jsonify(slots)
 
+
+@app.route('/api/getRoomForSlot', methods=['POST'])
+def getRoomForSlot():
+    data = request.json
+    print(data)
+    start = data['start']
+    modId = data['moduleId']
+    formatedStart = datetime.strptime(start, "%Y-%m-%d")
+    slots = Manualbooking.get_available_rooms_for_slot(formatedStart, modId)
+    return jsonify(slots)
+
+
+
+@app.route('/api/book_course', methods=['POST']) # a goat was here
+def book_course(
+    groupId: int,
+    modul_id: int,
+    start_date,
+    trainer_id: int,
+    room_id: int):
+    allGroups = dataGetter.get_Gruppen()
+    groupObj = {}
+    for group in allGroups:
+        if group['id'] == groupId:
+            groupObj = group
+    Manualbooking.book_manual_course(groupObj, modul_id, start_date, trainer_id, room_id)
+
+
+def bookCourse():
+
+
+
 if __name__ == '__main__':
     app.run(debug=True, port=5000)
