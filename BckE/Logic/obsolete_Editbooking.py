@@ -401,7 +401,7 @@ def change_trainer(kurs_id: int, new_trainer_id: int) -> dict:
         (p for p in Path(__file__).resolve().parents
          if p.name == "ProvadisBuchungSystem"), None
     )
-    db_path = str(proj_root / "BckE" / "SQL" / "WIP2.db")
+    db_path = str(proj_root / "BckE" / "SQL" / "Main.db")
     with sqlite3.connect(db_path) as conn:
         conn.execute(
             "UPDATE Kurse SET TrainerID = ? WHERE id = ?",
@@ -482,7 +482,7 @@ def change_room(kurs_id: int, new_room_id: int) -> dict:
         (p for p in Path(__file__).resolve().parents
          if p.name == "ProvadisBuchungSystem"), None
     )
-    db_path = str(proj_root / "BckE" / "SQL" / "WIP2.db")
+    db_path = str(proj_root / "BckE" / "SQL" / "Main.db")
     with sqlite3.connect(db_path) as conn:
         conn.execute(
             "UPDATE Kurse SET Raum = ? WHERE id = ?",
@@ -641,7 +641,7 @@ def change_timeframe(kurs_id: int,
         (p for p in Path(__file__).resolve().parents
          if p.name == "ProvadisBuchungSystem"), None
     )
-    db_path = str(proj_root / "BckE" / "SQL" / "WIP2.db")
+    db_path = str(proj_root / "BckE" / "SQL" / "Main.db")
     with sqlite3.connect(db_path) as conn:
         conn.execute(
             "UPDATE Kurse SET TrainerID = ?, Raum = ? WHERE id = ?",

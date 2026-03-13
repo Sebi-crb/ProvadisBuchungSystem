@@ -1,0 +1,98 @@
+
+<div id="sql-diag" style="padding:1rem 0;overflow-x:auto;min-height:400px"></div>
+<script type="module">
+import mermaid from 'https://esm.sh/mermaid@11/dist/mermaid.esm.min.mjs';
+const dark = matchMedia('(prefers-color-scheme: dark)').matches;
+await document.fonts.ready;
+mermaid.initialize({
+  startOnLoad: false,
+  theme: 'base',
+  fontFamily: '"Anthropic Sans", sans-serif',
+  themeVariables: {
+    darkMode: dark,
+    fontSize: '12px',
+    fontFamily: '"Anthropic Sans", sans-serif',
+    lineColor: dark ? '#5DCAA5' : '#0F6E56',
+    textColor: dark ? '#c2c0b6' : '#3d3d3a',
+    primaryColor: dark ? '#085041' : '#E1F5EE',
+    primaryTextColor: dark ? '#9FE1CB' : '#04342C',
+    primaryBorderColor: dark ? '#1D9E75' : '#1D9E75',
+    secondaryColor: dark ? '#04342C' : '#F1EFE8',
+    tertiaryColor: dark ? '#04342C' : '#F1EFE8',
+    background: 'transparent',
+    classText: dark ? '#c2c0b6' : '#2C2C2A',
+    edgeLabelBackground: dark ? '#04342C' : '#E1F5EE',
+    attributeBackgroundColorEven: dark ? '#2C2C2A' : '#F1EFE8',
+    attributeBackgroundColorOdd: dark ? '#333330' : '#ffffff',
+  }
+});
+const diagram = `classDiagram
+    class SQL_Azubi {
+        +String DB
+        +create_table()
+        +insert_Azubi(Azubi)
+        +get_all() list
+        +delete(id)
+        +insert_sample()
+        +drop_table()
+    }
+    class SQL_Gruppe {
+        +String DB
+        +create_table(conn)
+        +insert_AzubiGruppe(Gruppe)
+        +get_all() list
+        +get_block(id)
+        +add_absence(id, toAdd)
+        +change_absence(id, toRemove)
+        +drop_table()
+    }
+    class SQL_Trainer {
+        +String DB
+        +create_table()
+        +insert_Trainer(Trainer)
+        +get_all_Trainers() list
+        +get_Trainer(id)
+        +get_Trainer_absence(id)
+        +add_absence(id, toAdd)
+        +change_absence(id, toRemove)
+        +delete(id)
+    }
+    class SQL_Kurs {
+        +String DB
+        +create_table()
+        +insert_Kurs(Kurs)
+        +get_all_Kurse() list
+        +get_Kurs(id)
+        +get_kurs_start(id)
+        +get_kurs_end(id)
+        +update_course_dates(id, start, end)
+        +drop_table()
+        +insert_kurs_dates_into_trainer()
+        +insert_kurs_dates_into_gruppen()
+        +get_key_for_date(cal, target)
+    }
+    class SQL_Raum {
+        +String DB
+        +create_table()
+        +insert_Raeume()
+        +get_all_Rooms() list
+        +get_Room(id)
+        +get_room_IDs() list
+        +get_room_absence(id)
+        +get_PCKennung(id) bool
+        +add_absence(id, toAdd)
+        +change_absence(id, toRemove)
+        +delete(id)
+    }
+    SQL_Kurs --> SQL_Trainer : aktualisiert Abwesenheiten
+    SQL_Kurs --> SQL_Gruppe : aktualisiert Abwesenheiten
+    SQL_Kurs ..> SQL_Gruppe : get_block()
+    SQL_Kurs --> SQL_Raum : Tage blockieren`;
+try {
+  const { svg } = await mermaid.render('sql-svg', diagram);
+  document.getElementById('sql-diag').innerHTML = svg;
+  document.querySelector('#sql-diag svg').style.maxWidth = '100%';
+} catch(e) {
+  document.getElementById('sql-diag').innerHTML = '<p style="color:var(--color-text-secondary);font-size:13px">Diagramm konnte nicht gerendert werden: ' + e.message + '</p>';
+}
+</script>

@@ -1,0 +1,103 @@
+
+<div id="modelle-diag" style="padding:1rem 0;overflow-x:auto;min-height:400px"></div>
+<script type="module">
+import mermaid from 'https://esm.sh/mermaid@11/dist/mermaid.esm.min.mjs';
+const dark = matchMedia('(prefers-color-scheme: dark)').matches;
+await document.fonts.ready;
+mermaid.initialize({
+  startOnLoad: false,
+  theme: 'base',
+  fontFamily: '"Anthropic Sans", sans-serif',
+  themeVariables: {
+    darkMode: dark,
+    fontSize: '12px',
+    fontFamily: '"Anthropic Sans", sans-serif',
+    lineColor: dark ? '#AFA9EC' : '#534AB7',
+    textColor: dark ? '#c2c0b6' : '#3d3d3a',
+    primaryColor: dark ? '#3C3489' : '#EEEDFE',
+    primaryTextColor: dark ? '#CECBF6' : '#26215C',
+    primaryBorderColor: dark ? '#7F77DD' : '#7F77DD',
+    secondaryColor: dark ? '#26215C' : '#F1EFE8',
+    tertiaryColor: dark ? '#26215C' : '#F1EFE8',
+    background: 'transparent',
+    classText: dark ? '#c2c0b6' : '#2C2C2A',
+    edgeLabelBackground: dark ? '#26215C' : '#EEEDFE',
+    attributeBackgroundColorEven: dark ? '#2C2C2A' : '#F1EFE8',
+    attributeBackgroundColorOdd: dark ? '#333330' : '#ffffff',
+  }
+});
+const diagram = `classDiagram
+    class Azubi {
+        -String name
+        -String vorname
+        -String ausbildungsunternehmen
+        -int ausbildungsStart
+        -list attendedModules
+        -list abwesenheiten
+        -String block
+        -String id
+        +strip(string) String
+        +__str__() String
+    }
+    class Gruppe {
+        -String name
+        -list azubiList
+        -String block
+        -String attendedModules
+        +int countAzubis
+        +setCount(int)
+        +getAzubiCount() int
+        +__str__() String
+    }
+    class Trainer {
+        -String name
+        -String vorname
+        -list modulTeacher
+        -list abwesenheiten
+        -list blockedModul
+        +strip(string) String
+        +__str__() String
+    }
+    class Kurs {
+        -String name
+        -Object gruppe
+        -Object trainer
+        -String raum
+        -int modul
+        -date start
+        -date end
+        +strip(string) String
+        +__str__() String
+    }
+    class Modul {
+        -String name
+        -float dauer
+        -int zuordnungLernjahr
+        -list optionaleVorgaenger
+        -list verpflichtVorgaenger
+        -bool pcKennzeichnung
+        +strip(string) String
+        +__str__() String
+    }
+    class Raum {
+        -String name
+        -bool isPC
+        -list isBlocked
+        +strip(string) String
+        +__str__() String
+    }
+    Gruppe "1" o-- "0..*" Azubi : enthält
+    Kurs --> Gruppe : gebucht für
+    Kurs --> Trainer : unterrichtet von
+    Kurs --> Raum : findet statt in
+    Kurs --> Modul : basiert auf
+    Modul "0..*" --> "0..*" Modul : Vorgänger
+    Azubi "0..*" --> "0..*" Modul : absolviert`;
+try {
+  const { svg } = await mermaid.render('modelle-svg', diagram);
+  document.getElementById('modelle-diag').innerHTML = svg;
+  document.querySelector('#modelle-diag svg').style.maxWidth = '100%';
+} catch(e) {
+  document.getElementById('modelle-diag').innerHTML = '<p style="color:var(--color-text-secondary);font-size:13px">Diagramm konnte nicht gerendert werden: ' + e.message + '</p>';
+}
+</script>
